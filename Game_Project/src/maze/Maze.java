@@ -8,6 +8,8 @@ public class Maze {
     private final int height;
     private final Cell[][] grid;
     private final Random rand = new Random();
+    private final int exitRow;
+    private final int exitCol;
 
     public Maze(int width, int height) {
         this.width = width;
@@ -19,6 +21,9 @@ public class Maze {
                 grid[row][col] = new Cell(row, col);
             }
         }
+
+        this.exitRow = height - 1;
+        this.exitCol = width - 1;
     }
 
     public void generateMaze() {
@@ -75,7 +80,8 @@ public class Maze {
             for (int col = 0; col < width; col++) {
                 Cell cell = grid[row][col];
                 boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
-                String body = isPlayerHere ? " P " : "   ";
+                boolean isExit = (row == exitRow && col == exitCol);
+                String body = isPlayerHere ? " P " : (isExit ? " E " : "   ");
 
                 top.append(body);
                 top.append(cell.east ? "|" : " ");
@@ -101,6 +107,10 @@ public class Maze {
             case "D" -> !cell.east;
             default -> false;
         };
+    }
+
+    public boolean isAtExit(Player player) {
+        return player.getRow() == exitRow && player.getCol() == exitCol;
     }
 
     public int getWidth() {
