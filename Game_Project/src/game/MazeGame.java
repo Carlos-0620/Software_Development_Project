@@ -15,6 +15,12 @@ public class MazeGame {
 
         while (true) {
             maze.printMaze(player);
+            
+            if (maze.isAtExit(player)) {
+                System.out.println("🎉 Congratulations! You've reached the exit! 🎉");
+                break;
+            }
+
             System.out.print("Move (WASD, Q to quit): ");
             input = scanner.nextLine().toUpperCase();
 
@@ -31,6 +37,7 @@ public class MazeGame {
                 System.out.println("You hit a wall!");
             }
         }
+
         scanner.close();
         System.out.println("Game Over.");
     }
