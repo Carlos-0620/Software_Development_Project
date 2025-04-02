@@ -2,6 +2,7 @@ package graphicalUserInterface;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import java.awt.Color;
 
 
 public class GameWindow {
@@ -17,5 +18,6 @@ public class GameWindow {
 	
 	ImageIcon logo = new ImageIcon("logo.png"); //Creates an ImageIcon.
 	frame.setIconImage(logo.getImage()); //Changes icon of frame.
+	frame.getContentPane().setBackground(new Color(64, 64, 64)); //Changes colour of the background. 
 	}
 }
