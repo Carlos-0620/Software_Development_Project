@@ -17,25 +17,25 @@ public class MazeGame {
         Scanner scanner = new Scanner(System.in);
         String input;
 
-        // List<Sprite> spirits = new ArrayList<>();
-        // for (int i = 0; i < 3; i++) {
-        //     int randomRow = random.nextInt(maze.getHeight());
-        //     int randomCol = random.nextInt(maze.getWidth());
-        //     spirits.add(new Sprite(randomRow, randomCol));
-        // }
-        // while (true) {
-        //     maze.printMaze(player,spirits);
+        List<Sprite> spirits = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            int randomRow = random.nextInt(maze.getHeight());
+            int randomCol = random.nextInt(maze.getWidth());
+            spirits.add(new Sprite(randomRow, randomCol));
+        }
+        while (true) {
+            maze.printMaze(player,spirits);
             
-        //     if (maze.isAtExit(player)) {
-        //         System.out.println("🎉 Congratulations! You've reached the exit! 🎉");
-        //         break;
-        //     }
-            // for (Sprite spirit : spirits) {
-            //     if (spirit.getRow() == player.getRow() && spirit.getCol() == player.getCol()) {
-            //         System.out.println("💀 A spirit caught you! Game Over! 💀");
-            //         return;
-            //     }
-            // }
+            if (maze.isAtExit(player)) {
+                System.out.println("🎉 Congratulations! You've reached the exit! 🎉");
+                break;
+            }
+            for (Sprite spirit : spirits) {
+                if (spirit.getRow() == player.getRow() && spirit.getCol() == player.getCol()) {
+                    System.out.println("💀 A spirit caught you! Game Over! 💀");
+                    return;
+                }
+            }
 
             System.out.print("Move (WASD, Q to quit): ");
             input = scanner.nextLine().toUpperCase();
@@ -52,12 +52,13 @@ public class MazeGame {
             } else {
                 System.out.println("You hit a wall!");
             }
-            // for (Sprite spirit : spirits) {
-            //     spirit.moveRandomly(maze);
-            // }
+            for (Sprite spirit : spirits) {
+                spirit.moveRandomly(maze);
+            }
         }
 
         scanner.close();
         System.out.println("Game Over.");
         }
+    }
     
