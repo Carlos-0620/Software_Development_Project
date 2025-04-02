@@ -2,8 +2,9 @@ package maze;
 
 import java.util.*;
 import sprites.Player;
-
+import sprites.Sprite;
 public class Maze {
+      private final Random random = new Random();
     private final int width;
     private final int height;
     private final Cell[][] grid;
@@ -70,7 +71,7 @@ public class Maze {
         if (dCol == -1) { a.east = false; b.west = false; }
     }
 
-    public void printMaze(Player player) {
+    public void printMaze(Player player,List<Sprite> spirits) {
         System.out.println("+" + "---+".repeat(width));
 
         for (int row = 0; row < height; row++) {
@@ -81,19 +82,40 @@ public class Maze {
                 Cell cell = grid[row][col];
                 boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
                 boolean isExit = (row == exitRow && col == exitCol);
-                String body = isPlayerHere ? " P " : (isExit ? " E " : "   ");
+                boolean isSpiritHere = false;
+               
 
-                top.append(body);
-                top.append(cell.east ? "|" : " ");
+                for (Sprite spirit : spirits) {
+                    if (spirit.getRow() == row && spirit.getCol() == col) {
+                        isSpiritHere = true;
+                        break;
+                    }
+                }
+    
 
-                bottom.append(cell.south ? "---" : "   ");
-                bottom.append("+");
-            }
+                    String body;
+                    if (isPlayerHere) {
+                        body = " P ";
+                    } else if (isSpiritHere) {
+                        body = " X ";
+                    } else if (isExit) {
+                        body = " E ";
+                    } else {
+                        body = "   ";
+                    }
+                    top.append(body);
+                    top.append(cell.east ? "|" : " ");
+        
+                    bottom.append(cell.south ? "---" : "   ");
+                    bottom.append("+");
+                
+               
+        }
 
             System.out.println(top);
             System.out.println(bottom);
+         }
         }
-    }
 
     public boolean canMove(Player player, String direction) {
         int row = player.getRow();
@@ -105,6 +127,19 @@ public class Maze {
             case "S" -> !cell.south;
             case "A" -> !cell.west;
             case "D" -> !cell.east;
+            default -> false;
+        };
+    }
+    public boolean canMoveSprite(Sprite sprite, String direction) {
+        int row = sprite.getRow();
+        int col = sprite.getCol();
+        Cell cell = grid[row][col];
+    
+        return switch (direction.toUpperCase()) {
+            case "W" -> row > 0 && !cell.north;
+            case "S" -> row < height - 1 && !cell.south;
+            case "A" -> col > 0 && !cell.west;
+            case "D" -> col < width - 1 && !cell.east;
             default -> false;
         };
     }
