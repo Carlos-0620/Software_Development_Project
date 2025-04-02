@@ -3,21 +3,29 @@ package graphicalUserInterface;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import java.awt.Color;
+import game.MazeGame;
 
 
-public class GameWindow {
 
-	public static void main(String[] args) {
-		
-	JFrame frame = new JFrame(); //Creates a frame.
-	frame.setTitle("GameName"); //Sets name of the game on the frame.
-	frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Exits out of the application.
-	frame.setResizable(false); //Prevents frame form being resized.
-	frame.setSize(1000,700); //Sets the x and y dimensions of the frame.
-	frame.setVisible(true); //Makes frame visible.
+public class GameWindow extends JFrame {
 	
+	protected MazeGame game; //Imported game logic.
+	
+	public GameWindow(MazeGame game) {
+		this.game = game;
+		
+    //Window Configuration.
+	setTitle("GameName"); //Sets name of the game on the frame.
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Exits out of the application.
+	setResizable(false); //Prevents frame form being resized.
+	setSize(1000,700); //Sets the x and y dimensions of the 
+	setVisible(true); //Makes frame visible.
+	setLocationRelativeTo(null); //Center the window.
+	
+	//Window appearance.
 	ImageIcon logo = new ImageIcon("logo.png"); //Creates an ImageIcon.
-	frame.setIconImage(logo.getImage()); //Changes icon of frame.
-	frame.getContentPane().setBackground(new Color(64, 64, 64)); //Changes colour of the background. 
+	setIconImage(logo.getImage()); //Changes icon of frame.
+	getContentPane().setBackground(new Color(64, 64, 64)); //Changes colour of the background. 
+
 	}
 }
