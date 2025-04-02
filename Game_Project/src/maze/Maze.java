@@ -78,39 +78,39 @@ public class Maze {
             StringBuilder top = new StringBuilder("|");
             StringBuilder bottom = new StringBuilder("+");
 
-        //     for (int col = 0; col < width; col++) {
-        //         Cell cell = grid[row][col];
-        //         boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
-        //         boolean isExit = (row == exitRow && col == exitCol);
-        //         boolean isSpiritHere = false;
+            for (int col = 0; col < width; col++) {
+                Cell cell = grid[row][col];
+                boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
+                boolean isExit = (row == exitRow && col == exitCol);
+                boolean isSpiritHere = false;
                
 
-        //         for (Sprite spirit : spirits) {
-        //             if (spirit.getRow() == row && spirit.getCol() == col) {
-        //                 isSpiritHere = true;
-        //                 break;
-        //             }
-        //         }
+                for (Sprite spirit : spirits) {
+                    if (spirit.getRow() == row && spirit.getCol() == col) {
+                        isSpiritHere = true;
+                        break;
+                    }
+                }
     
 
-        //             String body;
-        //             if (isPlayerHere) {
-        //                 body = " P ";
-        //             } else if (isSpiritHere) {
-        //                 body = " X ";
-        //             } else if (isExit) {
-        //                 body = " E ";
-        //             } else {
-        //                 body = "   ";
-        //             }
-        //             top.append(body);
-        //             top.append(cell.east ? "|" : " ");
+                    String body;
+                    if (isPlayerHere) {
+                        body = " P ";
+                    } else if (isSpiritHere) {
+                        body = " X ";
+                    } else if (isExit) {
+                        body = " E ";
+                    } else {
+                        body = "   ";
+                    }
+                    top.append(body);
+                    top.append(cell.east ? "|" : " ");
         
-        //             bottom.append(cell.south ? "---" : "   ");
-        //             bottom.append("+");
+                    bottom.append(cell.south ? "---" : "   ");
+                    bottom.append("+");
                 
                
-        // }
+        }
 
             System.out.println(top);
             System.out.println(bottom);
@@ -130,19 +130,19 @@ public class Maze {
             default -> false;
         };
     }
-    // public boolean canMoveSprite(Sprite sprite, String direction) {
-    //     int row = sprite.getRow();
-    //     int col = sprite.getCol();
-    //     Cell cell = grid[row][col];
+    public boolean canMoveSprite(Sprite sprite, String direction) {
+        int row = sprite.getRow();
+        int col = sprite.getCol();
+        Cell cell = grid[row][col];
     
-    //     return switch (direction.toUpperCase()) {
-    //         case "W" -> row > 0 && !cell.north;
-    //         case "S" -> row < height - 1 && !cell.south;
-    //         case "A" -> col > 0 && !cell.west;
-    //         case "D" -> col < width - 1 && !cell.east;
-    //         default -> false;
-    //     };
-    // }
+        return switch (direction.toUpperCase()) {
+            case "W" -> row > 0 && !cell.north;
+            case "S" -> row < height - 1 && !cell.south;
+            case "A" -> col > 0 && !cell.west;
+            case "D" -> col < width - 1 && !cell.east;
+            default -> false;
+        };
+    }
 
     public boolean isAtExit(Player player) {
         return player.getRow() == exitRow && player.getCol() == exitCol;
