@@ -1,13 +1,15 @@
 package maze;
 
-import java.util.*;
 import sprites.Player;
+import sprites.Sprite;
+
+import java.util.*;
 
 public class Maze {
+    private final Random rand = new Random();
     private final int width;
     private final int height;
     private final Cell[][] grid;
-    private final Random rand = new Random();
     private final int exitRow;
     private final int exitCol;
 
@@ -70,7 +72,7 @@ public class Maze {
         if (dCol == -1) { a.east = false; b.west = false; }
     }
 
-    public void printMaze(Player player) {
+    public void printMazeWithTwoPlayers(Player p1, Player p2, List<Sprite> spirits) {
         System.out.println("+" + "---+".repeat(width));
 
         for (int row = 0; row < height; row++) {
@@ -79,11 +81,33 @@ public class Maze {
 
             for (int col = 0; col < width; col++) {
                 Cell cell = grid[row][col];
-                boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
-                boolean isExit = (row == exitRow && col == exitCol);
-                String body = isPlayerHere ? " P " : (isExit ? " E " : "   ");
 
-                top.append(body);
+                boolean isPlayer1 = (p1.getRow() == row && p1.getCol() == col);
+                boolean isPlayer2 = (p2.getRow() == row && p2.getCol() == col);
+                boolean isExit = (row == exitRow && col == exitCol);
+                boolean isSpirit = false;
+
+                for (Sprite spirit : spirits) {
+                    if (spirit.getRow() == row && spirit.getCol() == col) {
+                        isSpirit = true;
+                        break;
+                    }
+                }
+
+                String body;
+                if (isPlayer1) {
+                    body = "1";
+                } else if (isPlayer2) {
+                    body = "2";
+                } else if (isSpirit) {
+                    body = "X";
+                } else if (isExit) {
+                    body = "E";
+                } else {
+                    body = " ";
+                }
+
+                top.append(" ").append(body).append(" ");
                 top.append(cell.east ? "|" : " ");
 
                 bottom.append(cell.south ? "---" : "   ");
@@ -113,11 +137,15 @@ public class Maze {
         return player.getRow() == exitRow && player.getCol() == exitCol;
     }
 
-    public int getWidth() {
-        return width;
-    }
+    // Cell inner class (don't forget to include this!)
+    private static class Cell {
+        int row, col;
+        boolean north = true, south = true, east = true, west = true;
+        boolean visited = false;
 
-    public int getHeight() {
-        return height;
+        Cell(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
     }
 }

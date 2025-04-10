@@ -1,8 +1,8 @@
 package game;
 
+import java.util.Scanner;
 import maze.Maze;
 import sprites.Player;
-import java.util.Scanner;
 
 public class MazeGame {
 
