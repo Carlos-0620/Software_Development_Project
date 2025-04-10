@@ -14,7 +14,7 @@ public class MazeGame {
 
         // Create 2 players:
         Player player1 = new Player(0, 0);       // Player 1 at top-left
-        Player player2 = new Player(9, 9);       // Player 2 at bottom-right
+        Player player2 = new Player(0, 9);        // Player 2 at bottom-right
 
         Scanner scanner = new Scanner(System.in);
         String input;
