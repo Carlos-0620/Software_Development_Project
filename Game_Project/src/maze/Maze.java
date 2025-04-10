@@ -1,9 +1,8 @@
 package maze;
 
+import java.util.*;
 import sprites.Player;
 import sprites.Sprite;
-
-import java.util.*;
 
 public class Maze {
     private final Random rand = new Random();
@@ -133,11 +132,33 @@ public class Maze {
         };
     }
 
+    // ✅ NEW METHOD: for Sprite movement
+    public boolean canMoveSprite(Sprite sprite, String direction) {
+        int row = sprite.getRow();
+        int col = sprite.getCol();
+        Cell cell = grid[row][col];
+
+        return switch (direction.toUpperCase()) {
+            case "W" -> row > 0 && !cell.north;
+            case "S" -> row < height - 1 && !cell.south;
+            case "A" -> col > 0 && !cell.west;
+            case "D" -> col < width - 1 && !cell.east;
+            default -> false;
+        };
+    }
+
     public boolean isAtExit(Player player) {
         return player.getRow() == exitRow && player.getCol() == exitCol;
     }
 
-    // Cell inner class (don't forget to include this!)
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
     private static class Cell {
         int row, col;
         boolean north = true, south = true, east = true, west = true;

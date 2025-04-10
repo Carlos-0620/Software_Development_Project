@@ -1,4 +1,5 @@
 package sprites;
+
 import java.util.Random;
 import maze.Maze;
 
@@ -20,18 +21,26 @@ public class Sprite {
         return col;
     }
 
+    public void move(int dRow, int dCol) {
+        this.row += dRow;
+        this.col += dCol;
+    }
+
+    /**
+     * Move the sprite randomly in one of the four directions if possible.
+     * @param maze The maze object to check if movement is valid.
+     */
     public void moveRandomly(Maze maze) {
-        String[] directions = {"W", "S", "A", "D"};
-        for (int i = 0; i < 4; i++) {
-            String direction = directions[random.nextInt(directions.length)];
-            if (maze.canMoveSprite(this, direction)) {
-                switch (direction) {
-                    case "W" -> row--;
-                    case "S" -> row++;
-                    case "A" -> col--;
-                    case "D" -> col++;
-                }
-                break;
+        String[] directions = {"W", "A", "S", "D"};
+        int randomIndex = random.nextInt(directions.length);
+        String direction = directions[randomIndex];
+
+        if (maze.canMoveSprite(this, direction)) {
+            switch (direction) {
+                case "W" -> move(-1, 0);
+                case "S" -> move(1, 0);
+                case "A" -> move(0, -1);
+                case "D" -> move(0, 1);
             }
         }
     }
