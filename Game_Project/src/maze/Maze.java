@@ -13,6 +13,7 @@ public class Maze {
     private final int exitCol;
 
     public Maze(int width, int height) {
+        if (width % 2 != 0) width++;
         this.width = width;
         this.height = height;
         this.grid = new Cell[height][width];
@@ -41,6 +42,7 @@ public class Maze {
                 removeWalls(current, next);
                 next.visited = true;
                 stack.push(next);
+            
             } else {
                 stack.pop();
             }
@@ -112,7 +114,7 @@ public class Maze {
                
         }
 
-            System.out.println(top);
+            System.out.println(top);  
             System.out.println(bottom);
          }
         }

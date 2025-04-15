@@ -9,7 +9,7 @@ import sprites.Sprite;
 
 public class MazeGame {
     public static void main(String[] args) {
-        Maze maze = new Maze(10, 7);
+        Maze maze = new Maze(20, 7);
         maze.generateMaze();
         Player player = new Player(0, 0);
         Random random = new Random();
