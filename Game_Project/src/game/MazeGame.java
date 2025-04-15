@@ -1,5 +1,5 @@
 package game;
-import java.util.Random;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -8,57 +8,112 @@ import sprites.Player;
 import sprites.Sprite;
 
 public class MazeGame {
+
     public static void main(String[] args) {
-        Maze maze = new Maze(10, 7);
+        // Create a 10x10 maze
+        Maze maze = new Maze(10, 10);
         maze.generateMaze();
-        Player player = new Player(0, 0);
-        Random random = new Random();
+
+        // Create players
+        Player player1 = new Player(0, 0);       // Player 1 at top-left
+        Player player2 = new Player(0, 9);       // Player 2 at top-right
+
+        // Ensure players are not trapped at the start
+        maze.ensureOpeningsForStartPositions(player1, player2);
+
+        // Add sprites
+        List<Sprite> sprites = new ArrayList<>();
+        sprites.add(new Sprite(3, 3));
+        sprites.add(new Sprite(5, 5));
 
         Scanner scanner = new Scanner(System.in);
         String input;
 
-        List<Sprite> spirits = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            int randomRow = random.nextInt(maze.getHeight());
-            int randomCol = random.nextInt(maze.getWidth());
-            spirits.add(new Sprite(randomRow, randomCol));
-        }
+        // Initial maze display
+        maze.printMazeWithTwoPlayers(player1, player2, sprites);
+
         while (true) {
-            maze.printMaze(player,spirits);
-            
-            if (maze.isAtExit(player)) {
-                System.out.println("🎉 Congratulations! You've reached the exit! 🎉");
+            // Player 1 turn
+            System.out.print("Player 1 (Move WASD, Q to quit): ");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("Q")) {
                 break;
             }
-            for (Sprite spirit : spirits) {
-                if (spirit.getRow() == player.getRow() && spirit.getCol() == player.getCol()) {
-                    System.out.println("💀 A spirit caught you! Game Over! 💀");
+
+            // Check for collision with any sprite
+            for (Sprite spirit : sprites) {
+                if (spirit.getRow() == player1.getRow() && spirit.getCol() == player1.getCol()) {
+                    System.out.println("💀 A spirit caught Player 1! Game Over! 💀");
                     return;
                 }
             }
 
-            System.out.print("Move (WASD, Q to quit): ");
-            input = scanner.nextLine().toUpperCase();
-
-            if (input.equals("Q")) break;
-
-            if (maze.canMove(player, input)) {
+            if (maze.canMove(player1, input)) {
                 switch (input) {
-                    case "W" -> player.move(-1, 0);
-                    case "S" -> player.move(1, 0);
-                    case "A" -> player.move(0, -1);
-                    case "D" -> player.move(0, 1);
+                    case "W" -> player1.move(-1, 0);
+                    case "S" -> player1.move(1, 0);
+                    case "A" -> player1.move(0, -1);
+                    case "D" -> player1.move(0, 1);
                 }
             } else {
                 System.out.println("You hit a wall!");
             }
-            for (Sprite spirit : spirits) {
-                spirit.moveRandomly(maze);
+
+            if (maze.isAtExit(player1)) {
+                System.out.println("Congratulations Player 1! You've reached the exit! 🏆");
+                break;
             }
+
+            // Player 2 turn
+            System.out.print("Player 2 (Move IJKL, T to quit): ");
+            input = scanner.nextLine().toUpperCase();
+            if (input.equals("T")) {
+                break;
+            }
+
+            // Translate IJKL to WASD directions
+            String translatedDir = switch (input) {
+                case "I" -> "W";
+                case "K" -> "S";
+                case "J" -> "A";
+                case "L" -> "D";
+                default -> "";
+            };
+
+            // Check for collision before moving
+            for (Sprite spirit : sprites) {
+                if (spirit.getRow() == player2.getRow() && spirit.getCol() == player2.getCol()) {
+                    System.out.println("💀 A spirit caught Player 2! Game Over! 💀");
+                    return;
+                }
+            }
+
+            if (!translatedDir.isEmpty() && maze.canMove(player2, translatedDir)) {
+                switch (translatedDir) {
+                    case "W" -> player2.move(-1, 0);
+                    case "S" -> player2.move(1, 0);
+                    case "A" -> player2.move(0, -1);
+                    case "D" -> player2.move(0, 1);
+                }
+            } else {
+                System.out.println("You hit a wall!");
+            }
+
+            if (maze.isAtExit(player2)) {
+                System.out.println("Congratulations Player 2! You've reached the exit! 🏆");
+                break;
+            }
+
+            // Move all sprites randomly
+            for (Sprite sprite : sprites) {
+                sprite.moveRandomly(maze);
+            }
+
+            // Print maze after both players and sprites have moved
+            maze.printMazeWithTwoPlayers(player1, player2, sprites);
         }
 
         scanner.close();
         System.out.println("Game Over.");
-        }
     }
-    
+}

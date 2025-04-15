@@ -1,9 +1,8 @@
 package graphicalUserInterface;
 
+import game.MazeGame;
 import java.awt.Color;
-
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 
 //Child class for GameWindow.java
 
@@ -18,7 +17,7 @@ public class Frame extends GameWindow{
 		setIconImage(logo.getImage()); //Changes icon of frame.
 		getContentPane().setBackground(new Color(64, 64, 64)); //Changes colour of the background. 
 
-		intializeGameUI();
+		initializeGameUI();
 	}
 	
 	private void initializeGameUI() {

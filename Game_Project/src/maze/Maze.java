@@ -3,12 +3,12 @@ package maze;
 import java.util.*;
 import sprites.Player;
 import sprites.Sprite;
+
 public class Maze {
-      private final Random random = new Random();
+    private final Random rand = new Random();
     private final int width;
     private final int height;
     private final Cell[][] grid;
-    private final Random rand = new Random();
     private final int exitRow;
     private final int exitCol;
 
@@ -71,7 +71,17 @@ public class Maze {
         if (dCol == -1) { a.east = false; b.west = false; }
     }
 
-    public void printMaze(Player player,List<Sprite> spirits) {
+    public void ensureOpeningsForStartPositions(Player p1, Player p2) {
+        Cell start1 = grid[p1.getRow()][p1.getCol()];
+        start1.south = false;
+        start1.east = false;
+
+        Cell start2 = grid[p2.getRow()][p2.getCol()];
+        start2.south = false;
+        start2.west = false;
+    }
+
+    public void printMazeWithTwoPlayers(Player p1, Player p2, List<Sprite> spirits) {
         System.out.println("+" + "---+".repeat(width));
 
         for (int row = 0; row < height; row++) {
@@ -80,42 +90,43 @@ public class Maze {
 
             for (int col = 0; col < width; col++) {
                 Cell cell = grid[row][col];
-                boolean isPlayerHere = (player.getRow() == row && player.getCol() == col);
+
+                boolean isPlayer1 = (p1.getRow() == row && p1.getCol() == col);
+                boolean isPlayer2 = (p2.getRow() == row && p2.getCol() == col);
                 boolean isExit = (row == exitRow && col == exitCol);
-                boolean isSpiritHere = false;
-               
+                boolean isSpirit = false;
 
                 for (Sprite spirit : spirits) {
                     if (spirit.getRow() == row && spirit.getCol() == col) {
-                        isSpiritHere = true;
+                        isSpirit = true;
                         break;
                     }
                 }
-    
 
-                    String body;
-                    if (isPlayerHere) {
-                        body = " P ";
-                    } else if (isSpiritHere) {
-                        body = " X ";
-                    } else if (isExit) {
-                        body = " E ";
-                    } else {
-                        body = "   ";
-                    }
-                    top.append(body);
-                    top.append(cell.east ? "|" : " ");
-        
-                    bottom.append(cell.south ? "---" : "   ");
-                    bottom.append("+");
-                
-               
-        }
+                String body;
+                if (isPlayer1) {
+                    body = "1";
+                } else if (isPlayer2) {
+                    body = "2";
+                } else if (isSpirit) {
+                    body = "X";
+                } else if (isExit) {
+                    body = "E";
+                } else {
+                    body = " ";
+                }
+
+                top.append(" ").append(body).append(" ");
+                top.append(cell.east ? "|" : " ");
+
+                bottom.append(cell.south ? "---" : "   ");
+                bottom.append("+");
+            }
 
             System.out.println(top);
             System.out.println(bottom);
-         }
         }
+    }
 
     public boolean canMove(Player player, String direction) {
         int row = player.getRow();
@@ -130,11 +141,12 @@ public class Maze {
             default -> false;
         };
     }
+
     public boolean canMoveSprite(Sprite sprite, String direction) {
         int row = sprite.getRow();
         int col = sprite.getCol();
         Cell cell = grid[row][col];
-    
+
         return switch (direction.toUpperCase()) {
             case "W" -> row > 0 && !cell.north;
             case "S" -> row < height - 1 && !cell.south;
@@ -154,5 +166,16 @@ public class Maze {
 
     public int getHeight() {
         return height;
+    }
+
+    private static class Cell {
+        int row, col;
+        boolean north = true, south = true, east = true, west = true;
+        boolean visited = false;
+
+        Cell(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
     }
 }
