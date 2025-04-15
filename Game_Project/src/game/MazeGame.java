@@ -18,6 +18,9 @@ public class MazeGame {
         Player player1 = new Player(0, 0);       // Player 1 at top-left
         Player player2 = new Player(0, 9);       // Player 2 at top-right
 
+        // Ensure players are not trapped at the start
+        maze.ensureOpeningsForStartPositions(player1, player2);
+
         // Add sprites
         List<Sprite> sprites = new ArrayList<>();
         sprites.add(new Sprite(3, 3));
@@ -60,12 +63,21 @@ public class MazeGame {
                 break;
             }
 
-            if (maze.canMove(player2, input)) {
-                switch (input) {
-                    case "I" -> player2.move(-1, 0);
-                    case "K" -> player2.move(1, 0);
-                    case "J" -> player2.move(0, -1);
-                    case "L" -> player2.move(0, 1);
+            // Translate IJKL to WASD directions
+            String translatedDir = switch (input) {
+                case "I" -> "W";
+                case "K" -> "S";
+                case "J" -> "A";
+                case "L" -> "D";
+                default -> "";
+            };
+
+            if (!translatedDir.isEmpty() && maze.canMove(player2, translatedDir)) {
+                switch (translatedDir) {
+                    case "W" -> player2.move(-1, 0);
+                    case "S" -> player2.move(1, 0);
+                    case "A" -> player2.move(0, -1);
+                    case "D" -> player2.move(0, 1);
                 }
             } else {
                 System.out.println("You hit a wall!");

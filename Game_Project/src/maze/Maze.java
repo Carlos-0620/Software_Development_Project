@@ -71,6 +71,19 @@ public class Maze {
         if (dCol == -1) { a.east = false; b.west = false; }
     }
 
+    // Method to prevent players being trapped at the start
+    public void ensureOpeningsForStartPositions(Player p1, Player p2) {
+        // Player 1 (top-left): open south and east
+        Cell start1 = grid[p1.getRow()][p1.getCol()];
+        start1.south = false;
+        start1.east = false;
+
+        // Player 2 (top-right): open south and west
+        Cell start2 = grid[p2.getRow()][p2.getCol()];
+        start2.south = false;
+        start2.west = false;
+    }
+
     public void printMazeWithTwoPlayers(Player p1, Player p2, List<Sprite> spirits) {
         System.out.println("+" + "---+".repeat(width));
 
@@ -132,7 +145,6 @@ public class Maze {
         };
     }
 
-    // ✅ NEW METHOD: for Sprite movement
     public boolean canMoveSprite(Sprite sprite, String direction) {
         int row = sprite.getRow();
         int col = sprite.getCol();
