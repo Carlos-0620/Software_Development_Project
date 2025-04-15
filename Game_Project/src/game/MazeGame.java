@@ -11,11 +11,11 @@ import sprites.Sprite;
 public class MazeGame {
 
     public static void main(String[] args) {
-        Maze maze = new Maze(20, 7);  // Wider, mirrored maze
+        Maze maze = new Maze(20, 7);
         maze.generateMaze();
 
-        Player player1 = new Player(0, 0);
-        Player player2 = new Player(0, maze.getWidth() - 1);
+        Player player1 = new Player(0, 0);  // Player 1 starts top-left
+        Player player2 = new Player(maze.getHeight() - 1, maze.getWidth() - 1);  // Player 2 starts bottom-right
 
         maze.ensureOpeningsForStartPositions(player1, player2);
 
@@ -36,6 +36,7 @@ public class MazeGame {
         maze.printMazeWithTwoPlayers(player1, player2, sprites);
 
         while (true) {
+            // --- Player 1 turn ---
             System.out.print("Player 1 (WASD, Q to quit): ");
             input = scanner.nextLine().toUpperCase();
             if (input.equals("Q")) break;
@@ -51,11 +52,6 @@ public class MazeGame {
                 System.out.println("You hit a wall!");
             }
 
-            if (maze.isAtExit(player1)) {
-                System.out.println("🎉 Player 1 reached the exit! 🎉");
-                break;
-            }
-
             for (Sprite sprite : sprites) {
                 if (sprite.getRow() == player1.getRow() && sprite.getCol() == player1.getCol()) {
                     System.out.println("💀 A spirit caught Player 1! Game Over! 💀");
@@ -63,6 +59,12 @@ public class MazeGame {
                 }
             }
 
+            if (playerAtGoal(player1, maze.getHeight() - 1, maze.getWidth() - 1)) {
+                System.out.println("🎉 Player 1 reached the exit! 🎉");
+                break;
+            }
+
+            // --- Player 2 turn ---
             System.out.print("Player 2 (IJKL, T to quit): ");
             input = scanner.nextLine().toUpperCase();
             if (input.equals("T")) break;
@@ -86,16 +88,16 @@ public class MazeGame {
                 System.out.println("You hit a wall!");
             }
 
-            if (maze.isAtExit(player2)) {
-                System.out.println("🎉 Player 2 reached the exit! 🎉");
-                break;
-            }
-
             for (Sprite sprite : sprites) {
                 if (sprite.getRow() == player2.getRow() && sprite.getCol() == player2.getCol()) {
                     System.out.println("💀 A spirit caught Player 2! Game Over! 💀");
                     return;
                 }
+            }
+
+            if (playerAtGoal(player2, 0, 0)) {
+                System.out.println("🎉 Player 2 reached the exit! 🎉");
+                break;
             }
 
             for (Sprite sprite : sprites) {
@@ -107,5 +109,10 @@ public class MazeGame {
 
         scanner.close();
         System.out.println("Game Over.");
+    }
+
+    // Helper method for goal checking
+    private static boolean playerAtGoal(Player player, int goalRow, int goalCol) {
+        return player.getRow() == goalRow && player.getCol() == goalCol;
     }
 }
