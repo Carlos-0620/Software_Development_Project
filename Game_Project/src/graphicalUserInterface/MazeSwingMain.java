@@ -5,7 +5,7 @@ import game.MazeGame;
 //MazeSwingMain is a test class to launch the Swing version of the maze game.
 public class MazeSwingMain {
     public static void main(String[] args) {
-        // Create an instance of MazeGame. Adjust the constructor if parameters are needed.
+        // Create an instance of MazeGame
         MazeGame game = new MazeGame();
 
         // Create the main game frame passing the game logic
