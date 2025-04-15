@@ -42,7 +42,11 @@ public class Maze {
                 removeWalls(current, next);
                 next.visited = true;
                 stack.push(next);
-            
+                int mirroredRow = current.row;
+                int mirroredCol = width - 1 - current.col;
+                int mirroredNextRow = next.row;
+                int mirroredNextCol = width - 1 - next.col;
+                removeWalls(grid[mirroredRow][mirroredCol], grid[mirroredNextRow][mirroredNextCol]);
             } else {
                 stack.pop();
             }
