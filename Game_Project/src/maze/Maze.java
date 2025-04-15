@@ -13,6 +13,7 @@ public class Maze {
     private final int exitCol;
 
     public Maze(int width, int height) {
+        if (width % 2 != 0) width++; // Ensure even width for symmetry
         this.width = width;
         this.height = height;
         this.grid = new Cell[height][width];
@@ -41,6 +42,13 @@ public class Maze {
                 removeWalls(current, next);
                 next.visited = true;
                 stack.push(next);
+
+                int mirrorRow = current.row;
+                int mirrorCol = width - 1 - current.col;
+                int mirrorNextRow = next.row;
+                int mirrorNextCol = width - 1 - next.col;
+
+                removeWalls(grid[mirrorRow][mirrorCol], grid[mirrorNextRow][mirrorNextCol]);
             } else {
                 stack.pop();
             }
@@ -72,13 +80,11 @@ public class Maze {
     }
 
     public void ensureOpeningsForStartPositions(Player p1, Player p2) {
-        Cell start1 = grid[p1.getRow()][p1.getCol()];
-        start1.south = false;
-        start1.east = false;
+        grid[p1.getRow()][p1.getCol()].south = false;
+        grid[p1.getRow()][p1.getCol()].east = false;
 
-        Cell start2 = grid[p2.getRow()][p2.getCol()];
-        start2.south = false;
-        start2.west = false;
+        grid[p2.getRow()][p2.getCol()].south = false;
+        grid[p2.getRow()][p2.getCol()].west = false;
     }
 
     public void printMazeWithTwoPlayers(Player p1, Player p2, List<Sprite> spirits) {
@@ -96,8 +102,8 @@ public class Maze {
                 boolean isExit = (row == exitRow && col == exitCol);
                 boolean isSpirit = false;
 
-                for (Sprite spirit : spirits) {
-                    if (spirit.getRow() == row && spirit.getCol() == col) {
+                for (Sprite sprite : spirits) {
+                    if (sprite.getRow() == row && sprite.getCol() == col) {
                         isSpirit = true;
                         break;
                     }
@@ -118,7 +124,6 @@ public class Maze {
 
                 top.append(" ").append(body).append(" ");
                 top.append(cell.east ? "|" : " ");
-
                 bottom.append(cell.south ? "---" : "   ");
                 bottom.append("+");
             }
@@ -129,10 +134,7 @@ public class Maze {
     }
 
     public boolean canMove(Player player, String direction) {
-        int row = player.getRow();
-        int col = player.getCol();
-        Cell cell = grid[row][col];
-
+        Cell cell = grid[player.getRow()][player.getCol()];
         return switch (direction.toUpperCase()) {
             case "W" -> !cell.north;
             case "S" -> !cell.south;
@@ -143,15 +145,12 @@ public class Maze {
     }
 
     public boolean canMoveSprite(Sprite sprite, String direction) {
-        int row = sprite.getRow();
-        int col = sprite.getCol();
-        Cell cell = grid[row][col];
-
+        Cell cell = grid[sprite.getRow()][sprite.getCol()];
         return switch (direction.toUpperCase()) {
-            case "W" -> row > 0 && !cell.north;
-            case "S" -> row < height - 1 && !cell.south;
-            case "A" -> col > 0 && !cell.west;
-            case "D" -> col < width - 1 && !cell.east;
+            case "W" -> sprite.getRow() > 0 && !cell.north;
+            case "S" -> sprite.getRow() < height - 1 && !cell.south;
+            case "A" -> sprite.getCol() > 0 && !cell.west;
+            case "D" -> sprite.getCol() < width - 1 && !cell.east;
             default -> false;
         };
     }

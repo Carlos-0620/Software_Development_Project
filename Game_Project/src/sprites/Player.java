@@ -10,8 +10,8 @@ public class Player {
     }
 
     public void move(int dRow, int dCol) {
-        this.row += dRow;
-        this.col += dCol;
+        row += dRow;
+        col += dCol;
     }
 
     public int getRow() {
