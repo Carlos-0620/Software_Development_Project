@@ -18,6 +18,7 @@ public class Maze {
         this.grid = new Cell[height][width];
 
         for (int row = 0; row < height; row++) {
+            if (width % 2 != 0) width++;
             for (int col = 0; col < width; col++) {
                 grid[row][col] = new Cell(row, col);
             }
