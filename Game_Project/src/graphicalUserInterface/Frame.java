@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Frame extends GameWindow{
 	  private CardLayout cardLayout;
     private JPanel cardPanel;
-   
+    
     private MazePanel mazePanel;
 
 	public Frame(MazeGame game){
@@ -43,7 +43,11 @@ public class Frame extends GameWindow{
     
         cardLayout.show(cardPanel, "Ready");
 	}
-	
+	private void startGame(MazeGame game) {
+   
+        mazePanel.requestFocusInWindow();
+        cardLayout.show(cardPanel, "Game");
+    }
 	private void initializeGameUI() {
 		
 	}
