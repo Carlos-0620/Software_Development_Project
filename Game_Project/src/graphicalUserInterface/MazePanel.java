@@ -9,7 +9,7 @@ import game.MazeGame;
 
 
 public class MazePanel extends JPanel {
-    private MazeGame game; // Reference to the game logic, including maze, players, and sprites
+    public MazeGame game; 
 
     public MazePanel(MazeGame game) {
         this.game = game;

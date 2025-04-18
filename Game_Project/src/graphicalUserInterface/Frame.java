@@ -53,7 +53,7 @@ public class Frame extends JFrame {
 	private void initializeGameUI() {
 		
 	}
-	private void setBackgroundColor(Color color) {
+	public void setBackgroundColor(Color color) {
 		getContentPane().setBackground(color);
 	}
 }
