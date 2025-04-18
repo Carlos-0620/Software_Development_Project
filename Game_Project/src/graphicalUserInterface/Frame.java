@@ -1,13 +1,16 @@
 package graphicalUserInterface;
 
 import game.MazeGame;
-import java.awt.Color;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 
+import java.awt.*;
+import javax.swing.*;
 //Child class for GameWindow.java
 
 public class Frame extends GameWindow{
+	  private CardLayout cardLayout;
+    private JPanel cardPanel;
+   
+    private MazePanel mazePanel;
 
 	public Frame(MazeGame game){
 		super(game); //Calls for parents constructor with game reference,
@@ -25,8 +28,20 @@ public class Frame extends GameWindow{
 
 		initializeGameUI();
 
-		MazePanel mazePanel = new MazePanel(game);
-		add(mazePanel);
+	
+		cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+ 
+        
+        mazePanel = new MazePanel(game);
+        cardPanel.add(mazePanel, "Game");
+
+        add(cardPanel);
+        setVisible(true);
+
+    
+        cardLayout.show(cardPanel, "Ready");
 	}
 	
 	private void initializeGameUI() {
