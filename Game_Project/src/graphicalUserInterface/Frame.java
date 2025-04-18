@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Frame extends GameWindow{
 	  private CardLayout cardLayout;
     private JPanel cardPanel;
-    
+    private ReadyPanel readyPanel;
     private MazePanel mazePanel;
 
 	public Frame(MazeGame game){
@@ -33,7 +33,10 @@ public class Frame extends GameWindow{
         cardPanel = new JPanel(cardLayout);
 
  
-        
+        readyPanel = new ReadyPanel(() -> startGame(game));
+        cardPanel.add(readyPanel, "Ready");
+
+ 
         mazePanel = new MazePanel(game);
         cardPanel.add(mazePanel, "Game");
 
