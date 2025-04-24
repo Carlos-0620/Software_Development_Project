@@ -19,7 +19,6 @@ public class Maze {
         this.grid = new Cell[height][width];
 
         for (int row = 0; row < height; row++) {
-            if (width % 2 != 0) width++;
             for (int col = 0; col < width; col++) {
                 grid[row][col] = new Cell(row, col);
             }
@@ -32,7 +31,7 @@ public class Maze {
     public void generateMaze() {
         Stack<Cell> stack = new Stack<>();
         Cell start = grid[0][0];
-        start.visited = true;
+        start.setVisited(true);
         stack.push(start);
 
         while (!stack.isEmpty()) {
@@ -41,7 +40,7 @@ public class Maze {
 
             if (next != null) {
                 removeWalls(current, next);
-                next.visited = true;
+                next.setVisited(true);
                 stack.push(next);
             } else {
                 stack.pop();
@@ -51,77 +50,55 @@ public class Maze {
 
     private Cell getRandomUnvisitedNeighbor(Cell cell) {
         List<Cell> neighbors = new ArrayList<>();
-        int row = cell.row;
-        int col = cell.col;
+        int row = cell.getRow();
+        int col = cell.getCol();
 
-        if (row > 0 && !grid[row - 1][col].visited) neighbors.add(grid[row - 1][col]);
-        if (row < height - 1 && !grid[row + 1][col].visited) neighbors.add(grid[row + 1][col]);
-        if (col > 0 && !grid[row][col - 1].visited) neighbors.add(grid[row][col - 1]);
-        if (col < width - 1 && !grid[row][col + 1].visited) neighbors.add(grid[row][col + 1]);
+        if (row > 0 && !grid[row - 1][col].isVisited()) neighbors.add(grid[row - 1][col]);
+        if (row < height - 1 && !grid[row + 1][col].isVisited()) neighbors.add(grid[row + 1][col]);
+        if (col > 0 && !grid[row][col - 1].isVisited()) neighbors.add(grid[row][col - 1]);
+        if (col < width - 1 && !grid[row][col + 1].isVisited()) neighbors.add(grid[row][col + 1]);
 
         if (neighbors.isEmpty()) return null;
         return neighbors.get(rand.nextInt(neighbors.size()));
     }
 
     private void removeWalls(Cell a, Cell b) {
-        int dRow = a.row - b.row;
-        int dCol = a.col - b.col;
+        int dRow = a.getRow() - b.getRow();
+        int dCol = a.getCol() - b.getCol();
 
-        if (dRow == 1) { a.north = false; b.south = false; }
-        if (dRow == -1) { a.south = false; b.north = false; }
-        if (dCol == 1) { a.west = false; b.east = false; }
-        if (dCol == -1) { a.east = false; b.west = false; }
+        if (dRow == 1) { a.setNorth(false); b.setSouth(false); }
+        if (dRow == -1) { a.setSouth(false); b.setNorth(false); }
+        if (dCol == 1) { a.setWest(false); b.setEast(false); }
+        if (dCol == -1) { a.setEast(false); b.setWest(false); }
     }
 
     public void ensureOpeningsForStartPositions(Player p1, Player p2) {
-        grid[p1.getRow()][p1.getCol()].south = false;
-        grid[p1.getRow()][p1.getCol()].east = false;
-
-        grid[p2.getRow()][p2.getCol()].south = false;
-        grid[p2.getRow()][p2.getCol()].west = false;
+        Cell start1 = grid[p1.getRow()][p1.getCol()];
+        Cell start2 = grid[p2.getRow()][p2.getCol()];
+        start1.setSouth(false);
+        start1.setEast(false);
+        start2.setSouth(false);
+        start2.setWest(false);
     }
 
     public void printMazeWithTwoPlayers(Player p1, Player p2, List<Sprite> spirits) {
         System.out.println("+" + "---+".repeat(width));
-
         for (int row = 0; row < height; row++) {
             StringBuilder top = new StringBuilder("|");
             StringBuilder bottom = new StringBuilder("+");
-
             for (int col = 0; col < width; col++) {
-                Cell cell = grid[row][col];
+                final int currentRow = row;
+                final int currentCol = col;
+                Cell cell = grid[currentRow][currentCol];
+                boolean isPlayer1 = (p1.getRow() == currentRow && p1.getCol() == currentCol);
+                boolean isPlayer2 = (p2.getRow() == currentRow && p2.getCol() == currentCol);
+                boolean isExit = (currentRow == exitRow && currentCol == exitCol);
+                boolean isSpirit = spirits.stream().anyMatch(s -> s.getRow() == currentRow && s.getCol() == currentCol);
 
-                boolean isPlayer1 = (p1.getRow() == row && p1.getCol() == col);
-                boolean isPlayer2 = (p2.getRow() == row && p2.getCol() == col);
-                boolean isExit = (row == exitRow && col == exitCol);
-                boolean isSpirit = false;
-
-                for (Sprite sprite : spirits) {
-                    if (sprite.getRow() == row && sprite.getCol() == col) {
-                        isSpirit = true;
-                        break;
-                    }
-                }
-
-                String body;
-                if (isPlayer1) {
-                    body = "1";
-                } else if (isPlayer2) {
-                    body = "2";
-                } else if (isSpirit) {
-                    body = "X";
-                } else if (isExit) {
-                    body = "E";
-                } else {
-                    body = " ";
-                }
-
-                top.append(" ").append(body).append(" ");
-                top.append(cell.east ? "|" : " ");
-                bottom.append(cell.south ? "---" : "   ");
-                bottom.append("+");
+                String body = isPlayer1 ? "1" : isPlayer2 ? "2" : isSpirit ? "X" : isExit ? "E" : " ";
+                top.append(" ").append(body).append(" ").append(cell.hasEastWall() ? "|" : " ");
+                bottom.append(cell.hasSouthWall() ? "---" : "   ").append("+");
             }
-
             System.out.println(top);
             System.out.println(bottom);
         }
@@ -130,10 +107,10 @@ public class Maze {
     public boolean canMove(Player player, String direction) {
         Cell cell = grid[player.getRow()][player.getCol()];
         return switch (direction.toUpperCase()) {
-            case "W" -> !cell.north;
-            case "S" -> !cell.south;
-            case "A" -> !cell.west;
-            case "D" -> !cell.east;
+            case "W" -> !cell.hasNorthWall();
+            case "S" -> !cell.hasSouthWall();
+            case "A" -> !cell.hasWestWall();
+            case "D" -> !cell.hasEastWall();
             default -> false;
         };
     }
@@ -141,10 +118,10 @@ public class Maze {
     public boolean canMoveSprite(Sprite sprite, String direction) {
         Cell cell = grid[sprite.getRow()][sprite.getCol()];
         return switch (direction.toUpperCase()) {
-            case "W" -> sprite.getRow() > 0 && !cell.north;
-            case "S" -> sprite.getRow() < height - 1 && !cell.south;
-            case "A" -> sprite.getCol() > 0 && !cell.west;
-            case "D" -> sprite.getCol() < width - 1 && !cell.east;
+            case "W" -> sprite.getRow() > 0 && !cell.hasNorthWall();
+            case "S" -> sprite.getRow() < height - 1 && !cell.hasSouthWall();
+            case "A" -> sprite.getCol() > 0 && !cell.hasWestWall();
+            case "D" -> sprite.getCol() < width - 1 && !cell.hasEastWall();
             default -> false;
         };
     }
@@ -161,14 +138,19 @@ public class Maze {
         return height;
     }
 
-    private static class Cell {
-        int row, col;
-        boolean north = true, south = true, east = true, west = true;
-        boolean visited = false;
+    public boolean hasNorthWall(int row, int col) {
+        return grid[row][col].hasNorthWall();
+    }
 
-        Cell(int row, int col) {
-            this.row = row;
-            this.col = col;
-        }
+    public boolean hasSouthWall(int row, int col) {
+        return grid[row][col].hasSouthWall();
+    }
+
+    public boolean hasEastWall(int row, int col) {
+        return grid[row][col].hasEastWall();
+    }
+
+    public boolean hasWestWall(int row, int col) {
+        return grid[row][col].hasWestWall();
     }
 }
