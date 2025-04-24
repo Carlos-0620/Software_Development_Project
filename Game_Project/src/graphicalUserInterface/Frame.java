@@ -1,7 +1,6 @@
 package graphicalUserInterface;
 
 import game.MazeGame;
-
 import java.awt.*;
 import javax.swing.*;
 //Child class for GameWindow.java
@@ -16,7 +15,7 @@ public class Frame extends JFrame {
 		super("game"); //Calls for parents constructor with game reference,
 
 		//Customisation of window settings
-		ImageIcon logo = new ImageIcon("logo.png"); //Creates an ImageIcon.
+		ImageIcon logo = new ImageIcon("assets/logo.png"); //Creates an ImageIcon.
 		setIconImage(logo.getImage()); //Changes icon of frame.
 		getContentPane().setBackground(new Color(64, 64, 64)); //Changes colour of the background.
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
