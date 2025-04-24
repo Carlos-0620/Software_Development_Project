@@ -1,3 +1,4 @@
+// MazePanel.java
 package graphicalUserInterface;
 
 import game.MazeGame;
@@ -33,20 +34,18 @@ public class MazePanel extends JPanel {
         setupKeyBindings();
         startGameLoop();
 
-        requestFocusInWindow(); // Grab focus to receive key events
+        requestFocusInWindow();
     }
 
     private void setupKeyBindings() {
         InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
-        // Player 1: WASD
         bindKey(im, am, "W", true);  bindKey(im, am, "W", false);
         bindKey(im, am, "A", true);  bindKey(im, am, "A", false);
         bindKey(im, am, "S", true);  bindKey(im, am, "S", false);
         bindKey(im, am, "D", true);  bindKey(im, am, "D", false);
 
-        // Player 2: IJKL
         bindKey(im, am, "I", true);  bindKey(im, am, "I", false);
         bindKey(im, am, "J", true);  bindKey(im, am, "J", false);
         bindKey(im, am, "K", true);  bindKey(im, am, "K", false);
@@ -69,19 +68,18 @@ public class MazePanel extends JPanel {
     private void startGameLoop() {
         Timer timer = new Timer(80, e -> {
             updatePlayerMovement();
+            checkWinConditions();
             repaint();
         });
         timer.start();
     }
 
     private void updatePlayerMovement() {
-        // Player 1
         if (pressedKeys.contains("W")) tryMovePlayer(player1, "W");
         if (pressedKeys.contains("A")) tryMovePlayer(player1, "A");
         if (pressedKeys.contains("S")) tryMovePlayer(player1, "S");
         if (pressedKeys.contains("D")) tryMovePlayer(player1, "D");
 
-        // Player 2
         if (pressedKeys.contains("I")) tryMovePlayer(player2, "W");
         if (pressedKeys.contains("J")) tryMovePlayer(player2, "A");
         if (pressedKeys.contains("K")) tryMovePlayer(player2, "S");
@@ -96,6 +94,17 @@ public class MazePanel extends JPanel {
                 case "A" -> player.move(0, -1);
                 case "D" -> player.move(0, 1);
             }
+        }
+    }
+
+    private void checkWinConditions() {
+        if (player1.getRow() == maze.getHeight() - 1 && player1.getCol() == maze.getWidth() - 1) {
+            JOptionPane.showMessageDialog(this, "🎉 Player 1 wins! 🎉");
+            System.exit(0);
+        }
+        if (player2.getRow() == 0 && player2.getCol() == 0) {
+            JOptionPane.showMessageDialog(this, "🎉 Player 2 wins! 🎉");
+            System.exit(0);
         }
     }
 
