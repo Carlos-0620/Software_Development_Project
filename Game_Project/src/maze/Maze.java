@@ -19,6 +19,7 @@ public class Maze {
         this.grid = new Cell[height][width];
 
         for (int row = 0; row < height; row++) {
+            if (width % 2 != 0) width++;
             for (int col = 0; col < width; col++) {
                 grid[row][col] = new Cell(row, col);
             }
@@ -42,13 +43,6 @@ public class Maze {
                 removeWalls(current, next);
                 next.visited = true;
                 stack.push(next);
-
-                int mirrorRow = current.row;
-                int mirrorCol = width - 1 - current.col;
-                int mirrorNextRow = next.row;
-                int mirrorNextCol = width - 1 - next.col;
-
-                removeWalls(grid[mirrorRow][mirrorCol], grid[mirrorNextRow][mirrorNextCol]);
             } else {
                 stack.pop();
             }
