@@ -14,7 +14,7 @@ public class Frame extends JFrame {
         super("Maze Game");
 
         // Window configuration
-        ImageIcon logo = new ImageIcon("assets/logo.png");
+        ImageIcon logo = new ImageIcon(getClass().getResource("/assets/logo.png"));
         setIconImage(logo.getImage());
         getContentPane().setBackground(new Color(64, 64, 64));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
