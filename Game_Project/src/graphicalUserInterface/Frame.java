@@ -7,9 +7,9 @@ import javax.swing.*;
 public class Frame extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
-    private ReadyPanel readyPanel;
+    private final ReadyPanel readyPanel;
     private InstructionsPanel instructionsPanel;
-    private MazePanel mazePanel;
+    private final MazePanel mazePanel;
 
     public Frame(MazeGame game) {
         super("Maze Game");
@@ -28,7 +28,15 @@ public class Frame extends JFrame {
         cardPanel = new JPanel(cardLayout);
 
         // Ready Panel
-        readyPanel = new ReadyPanel(() -> cardLayout.show(cardPanel, "Instructions"));
+        readyPanel = new ReadyPanel(() -> {
+            cardLayout.show(cardPanel, "Instructions");
+
+            // 🔧 Ensure instructions panel receives keyboard focus
+            SwingUtilities.invokeLater(() -> {
+                instructionsPanel.requestFocusInWindow();
+                System.out.println("Focus requested for InstructionsPanel.");
+            });
+        });
         cardPanel.add(readyPanel, "Ready");
 
         // Instructions Panel
@@ -47,7 +55,7 @@ public class Frame extends JFrame {
     }
 
     private void startGame() {
-        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input
+        mazePanel.requestFocusInWindow(); // Make sure key input works for game
         cardLayout.show(cardPanel, "Game");
     }
 }
