@@ -141,57 +141,75 @@ public class MazePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Calculate the cell size dynamically to fit the panel
+        // Calculate cell size to fill the entire panel
         int panelWidth = getWidth();
         int panelHeight = getHeight();
         cellSize = Math.min(panelWidth / maze.getWidth(), panelHeight / maze.getHeight());
 
-        // Center the maze in the panel
+        // Calculate offsets to center the maze if there's any remaining space
         int xOffset = (panelWidth - (maze.getWidth() * cellSize)) / 2;
         int yOffset = (panelHeight - (maze.getHeight() * cellSize)) / 2;
 
-        // Draw the maze grid
+        // Draw maze with larger cells
         for (int row = 0; row < maze.getHeight(); row++) {
             for (int col = 0; col < maze.getWidth(); col++) {
                 int x = xOffset + col * cellSize;
                 int y = yOffset + row * cellSize;
 
-                // Draw floor
+                // Draw floor with full cell size
                 g.drawImage(floorImage, x, y, cellSize, cellSize, this);
+
+                // Draw walls with proportional thickness
+                int wallThickness = cellSize / 8; // Make walls thicker
 
                 // Draw walls
                 if (maze.hasNorthWall(row, col)) {
-                    g.drawImage(wallImage, x, y, cellSize, 5, this);
+                    g.drawImage(wallImage, x, y, cellSize, wallThickness, this);
                 }
                 if (maze.hasWestWall(row, col)) {
-                    g.drawImage(wallImage, x, y, 5, cellSize, this);
+                    g.drawImage(wallImage, x, y, wallThickness, cellSize, this);
                 }
                 if (maze.hasSouthWall(row, col)) {
-                    g.drawImage(wallImage, x, y + cellSize - 5, cellSize, 5, this);
+                    g.drawImage(wallImage, x, y + cellSize - wallThickness, cellSize, wallThickness, this);
                 }
                 if (maze.hasEastWall(row, col)) {
-                    g.drawImage(wallImage, x + cellSize - 5, y, 5, cellSize, this);
+                    g.drawImage(wallImage, x + cellSize - wallThickness, y, wallThickness, cellSize, this);
                 }
             }
         }
 
-        // Draw players
-        g.drawImage(player1Image, xOffset + player1.getCol() * cellSize + 5, yOffset + player1.getRow() * cellSize + 5,
-                cellSize - 10, cellSize - 10, this);
-        g.drawImage(player2Image, xOffset + player2.getCol() * cellSize + 5, yOffset + player2.getRow() * cellSize + 5,
-                cellSize - 10, cellSize - 10, this);
+        // Draw players with proportional size
+        int spriteMargin = cellSize / 10;
+        g.drawImage(player1Image,
+                xOffset + player1.getCol() * cellSize + spriteMargin,
+                yOffset + player1.getRow() * cellSize + spriteMargin,
+                cellSize - (2 * spriteMargin),
+                cellSize - (2 * spriteMargin),
+                this);
 
-        // Draw spirits
+        g.drawImage(player2Image,
+                xOffset + player2.getCol() * cellSize + spriteMargin,
+                yOffset + player2.getRow() * cellSize + spriteMargin,
+                cellSize - (2 * spriteMargin),
+                cellSize - (2 * spriteMargin),
+                this);
+
+        // Draw spirits with proportional size
+        int spiritMargin = cellSize / 8;
         for (Sprite spirit : spirits) {
-            g.drawImage(spiritImage, xOffset + spirit.getCol() * cellSize + 10,
-                    yOffset + spirit.getRow() * cellSize + 10, cellSize - 20, cellSize - 20, this);
+            g.drawImage(spiritImage,
+                    xOffset + spirit.getCol() * cellSize + spiritMargin,
+                    yOffset + spirit.getRow() * cellSize + spiritMargin,
+                    cellSize - (2 * spiritMargin),
+                    cellSize - (2 * spiritMargin),
+                    this);
         }
     }
 
     @Override
     public Dimension getPreferredSize() {
-        // Dynamically calculate the preferred size based on the maze dimensions
-        return new Dimension(maze.getWidth() * cellSize, maze.getHeight() * cellSize);
+        // Return a larger preferred size to allow the maze to scale up
+        return new Dimension(800, 800);
     }
 
     @Override

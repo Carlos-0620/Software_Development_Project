@@ -28,18 +28,21 @@ public class InstructionsPanel extends JPanel {
         add(title, BorderLayout.NORTH);
 
         // Instructions Text
-        JTextArea instructions = new JTextArea(
-                "Player 1 controls: WASD\n" +
-                        "Player 2 controls: Arrow keys\n\n" +
-                        "The first player to reach the end goal wins!\n" +
-                        "Be careful of the spirits in the maze!");
-        instructions.setFont(new Font("Papyrus", Font.BOLD, 40)); // Bigger and bolder font.
-        instructions.setForeground(new Color(255, 223, 186)); // Deeper orange color.
+        String mainInstructions = "Player 1 controls: WASD\n" +
+                "Player 2 controls: Arrow keys\n\n" +
+                "The first player to reach the end goal wins!\n" +
+                "Be careful of the spirits in the maze!\n\n";
+        String troubleshooting = "\nIf your keyboard or mouse isn't responding, please Alt+Tab twice.";
+
+        JTextPane instructions = new JTextPane();
+        instructions.setContentType("text/html");
+        instructions.setText("<html><div style='font-family: Papyrus; font-size: 34pt; color: #FFDFBA;'>"
+                + mainInstructions.replace("\n", "<br>")
+                + "<span style='color:rgb(66, 6, 6); font-weight: bold;'>" + troubleshooting + "</span></div></html>");
+
         instructions.setBackground(new Color(0, 0, 0, 0)); // Transparent background.
         instructions.setEditable(false);
-        instructions.setFocusable(false); // Ensure the text area does not steal focus.
-        instructions.setLineWrap(true);
-        instructions.setWrapStyleWord(true);
+        instructions.setFocusable(false);
         add(instructions, BorderLayout.CENTER);
 
         // Status Panel
@@ -47,11 +50,11 @@ public class InstructionsPanel extends JPanel {
         statusPanel.setOpaque(false); // Transparent panel.
 
         player1Status = new JLabel("Player 1 not ready (press WASD)", SwingConstants.CENTER);
-        player1Status.setFont(new Font("Papyrus", Font.BOLD, 26)); // Bolder font for readiness status.
+        player1Status.setFont(new Font("Papyrus", Font.BOLD, 29)); // Bolder font for readiness status.
         player1Status.setForeground(Color.BLACK); // Black when not ready.
 
         player2Status = new JLabel("Player 2 not ready (press arrow keys)", SwingConstants.CENTER);
-        player2Status.setFont(new Font("Papyrus", Font.BOLD, 26)); // Bolder font for readiness status.
+        player2Status.setFont(new Font("Papyrus", Font.BOLD, 29)); // Bolder font for readiness status.
         player2Status.setForeground(Color.BLACK); // Black when not ready.
 
         statusPanel.add(player1Status);
@@ -75,22 +78,22 @@ public class InstructionsPanel extends JPanel {
                 || keyCode == KeyEvent.VK_D)) {
             player1Ready = true;
             player1Status.setText("Player 1 is ready!");
-            player1Status.setForeground(new Color(0, 100, 0)); // Dark green when ready
+            player1Status.setForeground(new Color(0, 100, 0)); // Dark green when ready.
             System.out.println("Player 1 is ready!"); // Debugging readiness
             checkReadyStatus();
         } else if (!player2Ready && (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_DOWN
                 || keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
             player2Ready = true;
             player2Status.setText("Player 2 is ready!");
-            player2Status.setForeground(new Color(0, 100, 0)); // Dark green when ready
-            System.out.println("Player 2 is ready!"); // Debugging readiness
+            player2Status.setForeground(new Color(0, 100, 0)); // Dark green when ready.
+            System.out.println("Player 2 is ready!"); // Debugging readiness.
             checkReadyStatus();
         }
     }
 
     private void checkReadyStatus() {
         if (player1Ready && player2Ready) {
-            System.out.println("Both players are ready!"); // Debugging readiness
+            System.out.println("Both players are ready!"); // Debugging readiness.
             onBothReady.run();
         }
     }
@@ -98,7 +101,7 @@ public class InstructionsPanel extends JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
-        setFocusable(true); // Ensure the panel is focusable
+        setFocusable(true); // Ensure the panel is focusable.
         SwingUtilities.invokeLater(() -> {
             boolean focusGained = requestFocusInWindow();
             System.out.println("InstructionsPanel focus requested: " + focusGained);

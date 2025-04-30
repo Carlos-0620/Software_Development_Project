@@ -13,9 +13,19 @@ public class Frame extends JFrame {
     private MazePanel mazePanel;
 
     public Frame(MazeGame game) {
-        super("Maze Game");
+        super("Maze Adventure");
 
-        // Window configuration
+        try {
+            ImageIcon logo = new ImageIcon(getClass().getResource("/assets/logo.png"));
+            if (logo.getImage() != null) {
+                setIconImage(logo.getImage());
+            } else {
+                System.err.println("Could not load logo image");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading logo: " + e.getMessage());
+        }
+
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(true);
         setSize(1080, 720);
