@@ -95,7 +95,12 @@
                         case "A" -> player2.move(0, -1);
                         case "D" -> player2.move(0, 1);
                     }
-                } else {
+                } 
+                if (player1.getRow() == player2.getRow() && player1.getCol() == player2.getCol()) {
+                    System.out.println("Players collided! Game Over!");
+                    return;
+                }
+                else {
                     System.out.println("You hit a wall!");
                 }
 
