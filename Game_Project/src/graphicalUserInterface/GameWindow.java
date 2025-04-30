@@ -20,7 +20,7 @@ public class GameWindow extends JFrame {
 	setResizable(false); //Prevents frame form being resized.
 	setSize(1000,700); //Sets the x and y dimensions of the 
 	setVisible(true); //Makes frame visible.
-	setLocationRelativeTo(null); //Center the window.
+	setLocationRelativeTo(null);
 	
 	//Window appearance.
 	ImageIcon logo = new ImageIcon("logo.png"); //Creates an ImageIcon.
