@@ -26,7 +26,7 @@ public class MazeGame {
 
 		sprites = new ArrayList<>();
 		Random random = new Random();
-		while (sprites.size() < 3) {
+		while (sprites.size() < 2) {
 			int r = random.nextInt(maze.getHeight());
 			int c = random.nextInt(maze.getWidth());
 			if ((r != player1.getRow() || c != player1.getCol()) &&
