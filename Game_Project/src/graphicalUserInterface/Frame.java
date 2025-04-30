@@ -7,14 +7,15 @@ import javax.swing.*;
 public class Frame extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
-    private ReadyPanel readyPanel;
-    private MazePanel mazePanel;
+    private final ReadyPanel readyPanel;
+    private InstructionsPanel instructionsPanel;
+    private final MazePanel mazePanel;
 
     public Frame(MazeGame game) {
         super("Maze Game");
 
         // Window configuration
-        ImageIcon logo = new ImageIcon("assets/logo.png");
+        ImageIcon logo = new ImageIcon(getClass().getResource("/assets/logo.png"));
         setIconImage(logo.getImage());
         getContentPane().setBackground(new Color(64, 64, 64));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -26,9 +27,23 @@ public class Frame extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        readyPanel = new ReadyPanel(() -> startGame());
+        // Ready Panel
+        readyPanel = new ReadyPanel(() -> {
+            cardLayout.show(cardPanel, "Instructions");
+
+            // 🔧 Ensure instructions panel receives keyboard focus
+            SwingUtilities.invokeLater(() -> {
+                instructionsPanel.requestFocusInWindow();
+                System.out.println("Focus requested for InstructionsPanel.");
+            });
+        });
         cardPanel.add(readyPanel, "Ready");
 
+        // Instructions Panel
+        instructionsPanel = new InstructionsPanel(() -> startGame());
+        cardPanel.add(instructionsPanel, "Instructions");
+
+        // Maze Panel
         mazePanel = new MazePanel(game);
         cardPanel.add(mazePanel, "Game");
 
@@ -40,11 +55,7 @@ public class Frame extends JFrame {
     }
 
     private void startGame() {
-        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input
+        mazePanel.requestFocusInWindow(); // Make sure key input works for game
         cardLayout.show(cardPanel, "Game");
-    }
-
-    public void setBackgroundColor(Color color) {
-        getContentPane().setBackground(color);
     }
 }
