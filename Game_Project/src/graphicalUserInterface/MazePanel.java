@@ -24,36 +24,62 @@ public class MazePanel extends JPanel {
     private final Set<String> pressedKeys = new HashSet<>();
     private final Map<Player, Long> frozenUntil = new HashMap<>();
 
+    private final Image player1Image;
+    private final Image player2Image;
+    private final Image spiritImage;
+    private final Image wallImage;
+    private final Image floorImage;
+
     public MazePanel(MazeGame game) {
         this.maze = game.getMaze();
         this.player1 = game.getPlayer1();
         this.player2 = game.getPlayer2();
-        this.spirits = game.getSprites(); // ✅ make sure this matches your MazeGame class
+        this.spirits = game.getSprites();
+
+        // Load images
+        player1Image = new ImageIcon(getClass().getResource("/assets/player1.png")).getImage();
+        player2Image = new ImageIcon(getClass().getResource("/assets/player2.png")).getImage();
+        spiritImage = new ImageIcon(getClass().getResource("/assets/spirit.png")).getImage();
+        wallImage = new ImageIcon(getClass().getResource("/assets/maze_wall.jpg")).getImage();
+        floorImage = new ImageIcon(getClass().getResource("/assets/floor.png")).getImage();
 
         setPreferredSize(new Dimension(maze.getWidth() * cellSize, maze.getHeight() * cellSize));
         setBackground(Color.WHITE);
         setFocusable(true);
 
         setupKeyBindings();
+
         startGameLoop();
+
         startSpriteMovementLoop();
 
         requestFocusInWindow();
+
     }
 
     private void setupKeyBindings() {
         InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
-        bindKey(im, am, "W", true);  bindKey(im, am, "W", false);
-        bindKey(im, am, "A", true);  bindKey(im, am, "A", false);
-        bindKey(im, am, "S", true);  bindKey(im, am, "S", false);
-        bindKey(im, am, "D", true);  bindKey(im, am, "D", false);
+        // Player 1 controls (WASD)
+        bindKey(im, am, "W", true);
+        bindKey(im, am, "W", false);
+        bindKey(im, am, "A", true);
+        bindKey(im, am, "A", false);
+        bindKey(im, am, "S", true);
+        bindKey(im, am, "S", false);
+        bindKey(im, am, "D", true);
+        bindKey(im, am, "D", false);
 
-        bindKey(im, am, "I", true);  bindKey(im, am, "I", false);
-        bindKey(im, am, "J", true);  bindKey(im, am, "J", false);
-        bindKey(im, am, "K", true);  bindKey(im, am, "K", false);
-        bindKey(im, am, "L", true);  bindKey(im, am, "L", false);
+        // Player 2 controls (IJKL)
+        bindKey(im, am, "I", true);
+        bindKey(im, am, "I", false);
+        bindKey(im, am, "J", true); 
+        bindKey(im, am, "J", false);
+        bindKey(im, am, "K", true);
+        bindKey(im, am, "K", false);
+        bindKey(im, am, "L", true);
+        bindKey(im, am, "L", false);
     }
 
     private void bindKey(InputMap im, ActionMap am, String key, boolean pressed) {
@@ -63,8 +89,10 @@ public class MazePanel extends JPanel {
         am.put(actionKey, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (pressed) pressedKeys.add(key);
-                else pressedKeys.remove(key);
+                if (pressed)
+                    pressedKeys.add(key);
+                else
+                    pressedKeys.remove(key);
             }
         });
     }
@@ -85,22 +113,32 @@ public class MazePanel extends JPanel {
                 sprite.moveRandomly(maze);
             }
         });
+
         spriteTimer.start();
+
     }
 
     private void updatePlayerMovement() {
         if (!isFrozen(player1)) {
-            if (pressedKeys.contains("W")) tryMovePlayer(player1, "W");
-            if (pressedKeys.contains("A")) tryMovePlayer(player1, "A");
-            if (pressedKeys.contains("S")) tryMovePlayer(player1, "S");
-            if (pressedKeys.contains("D")) tryMovePlayer(player1, "D");
+            if (pressedKeys.contains("W"))
+                tryMovePlayer(player1, "W");
+            if (pressedKeys.contains("A"))
+                tryMovePlayer(player1, "A");
+            if (pressedKeys.contains("S"))
+                tryMovePlayer(player1, "S");
+            if (pressedKeys.contains("D"))
+                tryMovePlayer(player1, "D");
         }
 
         if (!isFrozen(player2)) {
-            if (pressedKeys.contains("I")) tryMovePlayer(player2, "W");
-            if (pressedKeys.contains("J")) tryMovePlayer(player2, "A");
-            if (pressedKeys.contains("K")) tryMovePlayer(player2, "S");
-            if (pressedKeys.contains("L")) tryMovePlayer(player2, "D");
+            if (pressedKeys.contains("I"))
+                tryMovePlayer(player2, "W");
+            if (pressedKeys.contains("J"))
+                tryMovePlayer(player2, "A");
+            if (pressedKeys.contains("K"))
+                tryMovePlayer(player2, "S");
+            if (pressedKeys.contains("L"))
+                tryMovePlayer(player2, "D");
         }
     }
 
@@ -143,36 +181,92 @@ public class MazePanel extends JPanel {
         if (player2.getRow() == 0 && player2.getCol() == 0) {
             JOptionPane.showMessageDialog(this, "🎉 Player 2 wins! 🎉");
             System.exit(0);
+
         }
+
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw maze walls
+        // Draw maze
         for (int row = 0; row < maze.getHeight(); row++) {
             for (int col = 0; col < maze.getWidth(); col++) {
                 int x = col * cellSize;
                 int y = row * cellSize;
-                if (maze.hasNorthWall(row, col)) g.drawLine(x, y, x + cellSize, y);
-                if (maze.hasWestWall(row, col)) g.drawLine(x, y, x, y + cellSize);
-                if (maze.hasSouthWall(row, col)) g.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
-                if (maze.hasEastWall(row, col)) g.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
+
+                // Draw floor
+                g.drawImage(floorImage, x, y, cellSize, cellSize, this);
+
+                // Draw walls
+                if (maze.hasNorthWall(row, col)) {
+                    g.drawImage(wallImage, x, y, cellSize, cellSize / 8, this);
+                }
+                if (maze.hasWestWall(row, col)) {
+                    g.drawImage(wallImage, x, y, cellSize / 8, cellSize, this);
+                }
+                if (maze.hasSouthWall(row, col)) {
+                    g.drawImage(wallImage, x, y + cellSize - cellSize / 8, cellSize, cellSize / 8, this);
+                }
+                if (maze.hasEastWall(row, col)) {
+                    g.drawImage(wallImage, x + cellSize - cellSize / 8, y, cellSize / 8, cellSize, this);
+                }
             }
         }
 
         // Draw players
-        g.setColor(isFrozen(player1) ? Color.CYAN : Color.BLUE);
-        g.fillOval(player1.getCol() * cellSize + 5, player1.getRow() * cellSize + 5, cellSize - 10, cellSize - 10);
+        int spriteMargin = cellSize / 10;
+        if (!isFrozen(player1)) {
+            g.drawImage(player1Image,
+                    player1.getCol() * cellSize + spriteMargin,
+                    player1.getRow() * cellSize + spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    this);
+        } else {
+            // Draw frozen player1 with transparency
+            Graphics2D g2d = (Graphics2D) g;
+            Composite oldComposite = g2d.getComposite();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+            g2d.drawImage(player1Image,
+                    player1.getCol() * cellSize + spriteMargin,
+                    player1.getRow() * cellSize + spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    this);
+            g2d.setComposite(oldComposite);
+        }
 
-        g.setColor(isFrozen(player2) ? Color.PINK : Color.RED);
-        g.fillOval(player2.getCol() * cellSize + 5, player2.getRow() * cellSize + 5, cellSize - 10, cellSize - 10);
+        if (!isFrozen(player2)) {
+            g.drawImage(player2Image,
+                    player2.getCol() * cellSize + spriteMargin,
+                    player2.getRow() * cellSize + spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    this);
+        } else {
+            // Draw frozen player2 with transparency
+            Graphics2D g2d = (Graphics2D) g;
+            Composite oldComposite = g2d.getComposite();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+            g2d.drawImage(player2Image,
+                    player2.getCol() * cellSize + spriteMargin,
+                    player2.getRow() * cellSize + spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    this);
+            g2d.setComposite(oldComposite);
+        }
 
         // Draw spirits
-        g.setColor(Color.BLACK);
         for (Sprite spirit : spirits) {
-            g.fillRect(spirit.getCol() * cellSize + 10, spirit.getRow() * cellSize + 10, cellSize - 20, cellSize - 20);
+            g.drawImage(spiritImage,
+                    spirit.getCol() * cellSize + spriteMargin,
+                    spirit.getRow() * cellSize + spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    cellSize - 2 * spriteMargin,
+                    this);
         }
     }
 }
