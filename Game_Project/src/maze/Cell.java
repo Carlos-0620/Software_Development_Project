@@ -3,15 +3,17 @@ package maze;
 public class Cell {
     private final int row;
     private final int col;
+    private boolean northWall = true;
+    private boolean southWall = true;
+    private boolean eastWall = true;
+    private boolean westWall = true;
     private boolean visited = false;
-    private boolean north = true, south = true, east = true, west = true;
 
     public Cell(int row, int col) {
         this.row = row;
         this.col = col;
     }
 
-    // Getters
     public int getRow() {
         return row;
     }
@@ -20,46 +22,48 @@ public class Cell {
         return col;
     }
 
+    public boolean hasNorthWall() {
+        return northWall;
+    }
+
+    public void setNorth(boolean northWall) {
+        this.northWall = northWall;
+    }
+
+    public boolean hasSouthWall() {
+        return southWall;
+    }
+
+    public void setSouth(boolean southWall) {
+        this.southWall = southWall;
+    }
+
+    public boolean hasEastWall() {
+        return eastWall;
+    }
+
+    public void setEast(boolean eastWall) {
+        this.eastWall = eastWall;
+    }
+
+    public boolean hasWestWall() {
+        return westWall;
+    }
+
+    public void setWest(boolean westWall) {
+        this.westWall = westWall;
+    }
+
     public boolean isVisited() {
         return visited;
     }
 
-    public boolean hasNorthWall() {
-        return north;
-    }
-
-    public boolean hasSouthWall() {
-        return south;
-    }
-
-    public boolean hasEastWall() {
-        return east;
-    }
-
-    public boolean hasWestWall() {
-        return west;
-    }
-
-    // Setters
     public void setVisited(boolean visited) {
         this.visited = visited;
     }
 
-    public void setNorth(boolean north) {
-        this.north = north;
-    }
-
-    public void setSouth(boolean south) {
-        this.south = south;
-    }
-
-    public void setEast(boolean east) {
-        this.east = east;
-    }
-
-    public void setWest(boolean west) {
-        this.west = west;
+    // Add the isWall method
+    public boolean isWall() {
+        return northWall && southWall && eastWall && westWall;
     }
 }
-
-

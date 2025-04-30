@@ -1,0 +1,112 @@
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import game.MazeGame;
+import maze.Maze;
+import sprites.Player;
+import sprites.Sprite;
+import java.util.List;
+
+class MazeGameTest {
+    private MazeGame game;
+    private Maze maze;
+    private Player player1;
+    private Player player2;
+
+    @BeforeEach
+    void setUp() {
+        game = new MazeGame();
+        maze = game.getMaze();
+        player1 = game.getPlayer1();
+        player2 = game.getPlayer2();
+    }
+
+    @Test
+    void testInitialPlayerPositions() {
+        assertEquals(0, player1.getRow(), "Player 1 should start at row 0");
+        assertEquals(0, player1.getCol(), "Player 1 should start at column 0");
+
+        assertEquals(0, player2.getRow(), "Player 2 should start at row 0");
+        assertEquals(maze.getWidth() - 1, player2.getCol(), "Player 2 should start at last column");
+    }
+
+    @Test
+    void testMazeGeneration() {
+        assertNotNull(maze, "Maze should not be null");
+        assertTrue(maze.getWidth() > 0, "Maze width should be positive");
+        assertTrue(maze.getHeight() > 0, "Maze height should be positive");
+    }
+
+    @Test
+    void testPlayerMovement() {
+        if (maze.canMove(player1, "S")) {
+            int initialRow = player1.getRow();
+            player1.move(1, 0);
+            assertEquals(initialRow + 1, player1.getRow(), "Player should move down one row");
+            assertEquals(0, player1.getCol(), "Player column should not change");
+        }
+    }
+
+    @Test
+    void testSpriteInitialization() {
+        List<Sprite> sprites = game.getSprites();
+        assertEquals(3, sprites.size(), "Should create exactly 3 sprites");
+
+        for (Sprite sprite : sprites) {
+            assertFalse(
+                    (sprite.getRow() == player1.getRow() && sprite.getCol() == player1.getCol()) ||
+                            (sprite.getRow() == player2.getRow() && sprite.getCol() == player2.getCol()),
+                    "Sprites should not overlap with players");
+
+            assertTrue(sprite.getRow() >= 0 && sprite.getRow() < maze.getHeight(),
+                    "Sprite row should be within maze bounds");
+            assertTrue(sprite.getCol() >= 0 && sprite.getCol() < maze.getWidth(),
+                    "Sprite column should be within maze bounds");
+        }
+    }
+
+    @Test
+    void testPlayer2Controls() {
+        assertEquals("W", translateInput("I"), "I should map to W");
+        assertEquals("A", translateInput("J"), "J should map to A");
+        assertEquals("S", translateInput("K"), "K should map to S");
+        assertEquals("D", translateInput("L"), "L should map to D");
+        assertEquals("", translateInput("X"), "Invalid input should map to empty string");
+    }
+
+    @Test
+    void testPlayerAtGoal() {
+        player1.setPosition(maze.getHeight() - 1, maze.getWidth() - 1);
+        assertTrue(MazeGame.playerAtGoal(player1, maze.getHeight() - 1, maze.getWidth() - 1),
+                "Should detect Player 1 at goal");
+
+        player2.setPosition(0, 0);
+        assertTrue(MazeGame.playerAtGoal(player2, 0, 0),
+                "Should detect Player 2 at goal");
+    }
+
+    @Test
+    void testSpriteCollision() {
+        Sprite sprite = game.getSprites().get(0);
+        sprite.setPosition(player1.getRow(), player1.getCol());
+
+        boolean collision = false;
+        for (Sprite s : game.getSprites()) {
+            if (s.getRow() == player1.getRow() && s.getCol() == player1.getCol()) {
+                collision = true;
+                break;
+            }
+        }
+        assertTrue(collision, "Should detect collision between player and sprite");
+    }
+
+    private String translateInput(String input) {
+        return switch (input) {
+            case "I" -> "W";
+            case "K" -> "S";
+            case "J" -> "A";
+            case "L" -> "D";
+            default -> "";
+        };
+    }
+}

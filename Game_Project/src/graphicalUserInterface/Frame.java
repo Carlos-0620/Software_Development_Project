@@ -2,6 +2,7 @@ package graphicalUserInterface;
 
 import game.MazeGame;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 public class Frame extends JFrame {
@@ -15,39 +16,47 @@ public class Frame extends JFrame {
         super("Maze Game");
 
         // Window configuration
-        ImageIcon logo = new ImageIcon(getClass().getResource("/assets/logo.png"));
-        setIconImage(logo.getImage());
-        getContentPane().setBackground(new Color(64, 64, 64));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setResizable(false);
+        setResizable(true);
         setSize(1080, 720);
         setLocationRelativeTo(null);
 
-        // Layout and panel setup
+        // Set up CardLayout
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Ready Panel
+        // Ready Panel (Menu Panel)
         readyPanel = new ReadyPanel(() -> cardLayout.show(cardPanel, "Instructions"));
         cardPanel.add(readyPanel, "Ready");
 
         // Instructions Panel
-        instructionsPanel = new InstructionsPanel(() -> startGame());
+        instructionsPanel = new InstructionsPanel(() -> cardLayout.show(cardPanel, "Game"));
         cardPanel.add(instructionsPanel, "Instructions");
 
-        // Maze Panel
+        // Maze Panel (Game Panel)
         mazePanel = new MazePanel(game);
         cardPanel.add(mazePanel, "Game");
 
+        // Add the card panel to the frame
         add(cardPanel);
-        setVisible(true);
 
-        // Show the ready screen initially
+        // Show the ready panel initially
         cardLayout.show(cardPanel, "Ready");
-    }
 
-    private void startGame() {
-        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input
-        cardLayout.show(cardPanel, "Game");
+        // Add focus listener to debug focus changes
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+                .addPropertyChangeListener("focusOwner", evt -> {
+                    System.out.println("Focus changed to: " + evt.getNewValue());
+                });
+
+        // Add window listener to ensure focus
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window activated");
+                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                System.out.println("Current focus owner: " + focusOwner);
+            }
+        });
     }
 }
