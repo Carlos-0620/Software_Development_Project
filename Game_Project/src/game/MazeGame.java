@@ -108,7 +108,7 @@
                 for (Sprite sprite : sprites) {
                     sprite.moveRandomly(maze);
                 }
-
+                System.out.println("Remaining spirits: " + sprites.size());
                 // Print maze after both players and sprites have moved
                 maze.printMazeWithTwoPlayers(player1, player2, sprites);
             }
