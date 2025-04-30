@@ -1,58 +1,79 @@
 package graphicalUserInterface;
 
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import javax.swing.*;
 
 public class ReadyPanel extends JPanel {
-    private Runnable onStartGame;
-    private Image backgroundImage;
+    private boolean player1Ready = false;
+    private boolean player2Ready = false;
+    private JLabel player1Status;
+    private JLabel player2Status;
+    private Runnable onBothReady;
 
-    public ReadyPanel(Runnable onStartGame) {
-        this.onStartGame = onStartGame;
-
-        // Load the background image
-        backgroundImage = new ImageIcon(getClass().getResource("/assets/rustic_maze.jpg")).getImage();
+    public ReadyPanel(Runnable onBothReady) {
+        this.onBothReady = onBothReady;
 
         setLayout(new BorderLayout());
+        setBackground(Color.DARK_GRAY);
 
-        // Title
-        JLabel title = new JLabel("Maze Adventure", SwingConstants.CENTER);
-        title.setFont(new Font("Papyrus", Font.BOLD, 100)); // Increased font size and bold style.
-        title.setForeground(new Color(255, 223, 186)); // Light beige color.
+        JLabel title = new JLabel("Maze Game", SwingConstants.CENTER);
+        title.setFont(new Font("Arial", Font.BOLD, 36));
+        title.setForeground(Color.WHITE);
         add(title, BorderLayout.NORTH);
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 20, 20)); // 2 rows, 1 column
-        buttonPanel.setOpaque(false); // Make the panel transparent.
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(50, 200, 50, 200)); // Add padding.
+        JPanel statusPanel = new JPanel(new GridLayout(2, 1));
+        statusPanel.setBackground(Color.DARK_GRAY);
 
-        // Play Button
-        JButton playButton = new JButton(new ImageIcon(getClass().getResource("/assets/play.png")));
-        playButton.setContentAreaFilled(false); // Make the button background transparent.
-        playButton.setBorderPainted(false); // Remove the button border.
-        playButton.setFocusPainted(false); // Remove focus border.
-        playButton.addActionListener(e -> onStartGame.run());
+        player1Status = new JLabel("Player 1 not ready (press WASD)", SwingConstants.CENTER);
+        player1Status.setFont(new Font("Arial", Font.PLAIN, 24));
+        player1Status.setForeground(Color.WHITE);
 
-        // Quit Button
-        JButton quitButton = new JButton(new ImageIcon(getClass().getResource("/assets/quit.png")));
-        quitButton.setContentAreaFilled(false); // Make the background transparent.
-        quitButton.setBorderPainted(false); // Remove the button border.
-        quitButton.setFocusPainted(false); // Remove focus border.
-        quitButton.addActionListener(e -> System.exit(0));
+        player2Status = new JLabel("Player 2 not ready (press arrow keys)", SwingConstants.CENTER);
+        player2Status.setFont(new Font("Arial", Font.PLAIN, 24));
+        player2Status.setForeground(Color.WHITE);
 
-        // Add buttons to the panel
-        buttonPanel.add(playButton);
-        buttonPanel.add(quitButton);
+        statusPanel.add(player1Status);
+        statusPanel.add(player2Status);
+        add(statusPanel, BorderLayout.CENTER);
 
-        add(buttonPanel, BorderLayout.CENTER);
+        setFocusable(true);
+        requestFocusInWindow();
+
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                handleKeyPress(e);
+            }
+        });
+    }
+
+    private void handleKeyPress(KeyEvent e) {
+        int keyCode = e.getKeyCode();
+        if (!player1Ready && (keyCode == KeyEvent.VK_W || keyCode == KeyEvent.VK_A || keyCode == KeyEvent.VK_S
+                || keyCode == KeyEvent.VK_D)) {
+            player1Ready = true;
+            player1Status.setText("Player 1 is ready!");
+            checkReadyStatus();
+        } else if (!player2Ready && (keyCode == KeyEvent.VK_UP || keyCode == KeyEvent.VK_DOWN
+                || keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
+            player2Ready = true;
+            player2Status.setText("Player 2 is ready!");
+            checkReadyStatus();
+        }
+    }
+
+    private void checkReadyStatus() {
+        if (player1Ready && player2Ready) {
+
+            onBothReady.run();
+        }
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        // Draw the background image
-        if (backgroundImage != null) {
-            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
-        }
+    public void addNotify() {
+        super.addNotify();
+        requestFocusInWindow();
     }
 }

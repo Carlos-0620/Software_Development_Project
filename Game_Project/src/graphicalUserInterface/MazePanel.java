@@ -25,16 +25,10 @@ public class MazePanel extends JPanel {
         this.maze = game.getMaze();
         this.player1 = game.getPlayer1();
         this.player2 = game.getPlayer2();
-        this.spirits = game.getSprites(); // ✅ make sure this matches your MazeGame class
+        this.spirits = game.getSprites();
 
-        // Load decorative images
-        wallImage = new ImageIcon(getClass().getResource("/assets/maze_wall.jpg")).getImage();
-        floorImage = new ImageIcon(getClass().getResource("/assets/floor.png")).getImage();
-        player1Image = new ImageIcon(getClass().getResource("/assets/player1.png")).getImage();
-        player2Image = new ImageIcon(getClass().getResource("/assets/player2.png")).getImage();
-        spiritImage = new ImageIcon(getClass().getResource("/assets/spirit.png")).getImage();
-
-        setBackground(Color.BLACK);
+        setPreferredSize(new Dimension(maze.getWidth() * cellSize, maze.getHeight() * cellSize));
+        setBackground(Color.WHITE);
         setFocusable(true);
 
         setupKeyBindings();
@@ -72,8 +66,11 @@ public class MazePanel extends JPanel {
         im.put(keyStroke, actionKey);
         am.put(actionKey, new AbstractAction() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                handleKeyPress(e);
+            public void actionPerformed(ActionEvent e) {
+                if (pressed)
+                    pressedKeys.add(key);
+                else
+                    pressedKeys.remove(key);
             }
         });
     }
@@ -85,15 +82,6 @@ public class MazePanel extends JPanel {
             repaint();
         });
         timer.start();
-    }
-
-    private void startSpriteMovementLoop() {
-        Timer spriteTimer = new Timer(1000, e -> {
-            for (Sprite sprite : spirits) {
-                sprite.moveRandomly(maze);
-            }
-        });
-        spriteTimer.start();
     }
 
     private void updatePlayerMovement() {
@@ -144,28 +132,16 @@ public class MazePanel extends JPanel {
 
         for (int row = 0; row < maze.getHeight(); row++) {
             for (int col = 0; col < maze.getWidth(); col++) {
-                int x = xOffset + col * cellSize;
-                int y = yOffset + row * cellSize;
-
-                // Draw floor with full cell size
-                g.drawImage(floorImage, x, y, cellSize, cellSize, this);
-
-                // Draw walls with proportional thickness
-                int wallThickness = cellSize / 8; // Make walls thicker
-
-                // Draw walls
-                if (maze.hasNorthWall(row, col)) {
-                    g.drawImage(wallImage, x, y, cellSize, wallThickness, this);
-                }
-                if (maze.hasWestWall(row, col)) {
-                    g.drawImage(wallImage, x, y, wallThickness, cellSize, this);
-                }
-                if (maze.hasSouthWall(row, col)) {
-                    g.drawImage(wallImage, x, y + cellSize - wallThickness, cellSize, wallThickness, this);
-                }
-                if (maze.hasEastWall(row, col)) {
-                    g.drawImage(wallImage, x + cellSize - wallThickness, y, wallThickness, cellSize, this);
-                }
+                int x = col * cellSize;
+                int y = row * cellSize;
+                if (maze.hasNorthWall(row, col))
+                    g.drawLine(x, y, x + cellSize, y);
+                if (maze.hasWestWall(row, col))
+                    g.drawLine(x, y, x, y + cellSize);
+                if (maze.hasSouthWall(row, col))
+                    g.drawLine(x, y + cellSize, x + cellSize, y + cellSize);
+                if (maze.hasEastWall(row, col))
+                    g.drawLine(x + cellSize, y, x + cellSize, y + cellSize);
             }
         }
 
@@ -177,28 +153,7 @@ public class MazePanel extends JPanel {
 
         g.setColor(Color.BLACK);
         for (Sprite spirit : spirits) {
-            g.drawImage(spiritImage,
-                    xOffset + spirit.getCol() * cellSize + spiritMargin,
-                    yOffset + spirit.getRow() * cellSize + spiritMargin,
-                    cellSize - (2 * spiritMargin),
-                    cellSize - (2 * spiritMargin),
-                    this);
+            g.fillRect(spirit.getCol() * cellSize + 10, spirit.getRow() * cellSize + 10, cellSize - 20, cellSize - 20);
         }
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        // Return a larger preferred size to allow the maze to scale up
-        return new Dimension(800, 800);
-    }
-
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        SwingUtilities.invokeLater(() -> {
-            boolean focusGained = requestFocusInWindow();
-            System.out.println("MazePanel focus requested: " + focusGained);
-            System.out.println("MazePanel has focus: " + hasFocus());
-        });
     }
 }
