@@ -20,7 +20,7 @@ public class MazePanel extends JPanel {
     private final Player player2;
     private final List<Sprite> spirits;
 
-    private final int cellSize = 30;
+    private final int cellSize = 35;  // Adjusted for the larger maze
     private final Set<String> pressedKeys = new HashSet<>();
     private final Map<Player, Long> frozenUntil = new HashMap<>();
 
@@ -74,7 +74,7 @@ public class MazePanel extends JPanel {
         // Player 2 controls (IJKL)
         bindKey(im, am, "I", true);
         bindKey(im, am, "I", false);
-        bindKey(im, am, "J", true); 
+        bindKey(im, am, "J", true);
         bindKey(im, am, "J", false);
         bindKey(im, am, "K", true);
         bindKey(im, am, "K", false);

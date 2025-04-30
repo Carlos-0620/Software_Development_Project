@@ -2,7 +2,6 @@ package game;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 import maze.Maze;
 import sprites.Player;
@@ -16,23 +15,17 @@ public class MazeGame {
 	private final List<Sprite> sprites;
 
 	public MazeGame() {
-		maze = new Maze(20, 7);
+		maze = new Maze(30, 20); // Adjusted to fit 1080x720 window with 35px cells
 		maze.generateMaze();
 
-		player1 = new Player(0, 0);  // Player 1 starts top-left
-		player2 = new Player(maze.getHeight() - 1, maze.getWidth() - 1);  // Player 2 starts bottom-right
-
+		player1 = new Player(0, 0);
+		player2 = new Player(0, maze.getWidth() - 1);
 		maze.ensureOpeningsForStartPositions(player1, player2);
 
 		sprites = new ArrayList<>();
-		Random random = new Random();
-		while (sprites.size() < 2) {
-			int r = random.nextInt(maze.getHeight());
-			int c = random.nextInt(maze.getWidth());
-			if ((r != player1.getRow() || c != player1.getCol()) &&
-					(r != player2.getRow() || c != player2.getCol())) {
-				sprites.add(new Sprite(r, c));
-			}
+		// Add spirits
+		for (int i = 0; i < 4; i++) {
+			sprites.add(new Sprite(maze.getHeight() / 2, maze.getWidth() / 2));
 		}
 	}
 
@@ -46,14 +39,15 @@ public class MazeGame {
 		while (true) {
 			System.out.print("Player 1 (WASD, Q to quit): ");
 			input = scanner.nextLine().toUpperCase();
-			if (input.equals("Q")) break;
+			if (input.equals("Q"))
+				break;
 
 			if (game.maze.canMove(game.player1, input)) {
 				switch (input) {
-				case "W" -> game.player1.move(-1, 0);
-				case "S" -> game.player1.move(1, 0);
-				case "A" -> game.player1.move(0, -1);
-				case "D" -> game.player1.move(0, 1);
+					case "W" -> game.player1.move(-1, 0);
+					case "S" -> game.player1.move(1, 0);
+					case "A" -> game.player1.move(0, -1);
+					case "D" -> game.player1.move(0, 1);
 				}
 			} else {
 				System.out.println("You hit a wall!");
@@ -73,22 +67,23 @@ public class MazeGame {
 
 			System.out.print("Player 2 (IJKL, T to quit): ");
 			input = scanner.nextLine().toUpperCase();
-			if (input.equals("T")) break;
+			if (input.equals("T"))
+				break;
 
 			String translatedDir = switch (input) {
-			case "I" -> "W";
-			case "K" -> "S";
-			case "J" -> "A";
-			case "L" -> "D";
-			default -> "";
+				case "I" -> "W";
+				case "K" -> "S";
+				case "J" -> "A";
+				case "L" -> "D";
+				default -> "";
 			};
 
 			if (!translatedDir.isEmpty() && game.maze.canMove(game.player2, translatedDir)) {
 				switch (translatedDir) {
-				case "W" -> game.player2.move(-1, 0);
-				case "S" -> game.player2.move(1, 0);
-				case "A" -> game.player2.move(0, -1);
-				case "D" -> game.player2.move(0, 1);
+					case "W" -> game.player2.move(-1, 0);
+					case "S" -> game.player2.move(1, 0);
+					case "A" -> game.player2.move(0, -1);
+					case "D" -> game.player2.move(0, 1);
 				}
 			} else {
 				System.out.println("You hit a wall!");

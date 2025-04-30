@@ -1,20 +1,27 @@
 package graphicalUserInterface;
 
 import game.MazeGame;
+wwimport javax.swing.SwingUtilities;
 
-// Run game from this class.
 public class MazeSwingMain {
     public static void main(String[] args) {
-        // Create the game instance
-        MazeGame game = new MazeGame();
+        SwingUtilities.invokeLater(() -> {
+            // Create the game instance
+            MazeGame game = new MazeGame();
 
-        // Create the main frame
-        Frame frame = new Frame(game);
+            // Create the main frame
+            Frame frame = new Frame(game);
 
-        // Make the frame visible
-        frame.setVisible(true);
+            // Pack the frame to fit the maze content
+            frame.pack();
 
-        // Debugging message to confirm the application is running
-        System.out.println("Maze game started successfully.");
+            // Center the frame on screen
+            frame.setLocationRelativeTo(null);
+
+            // Make the frame visible
+            frame.setVisible(true);
+
+            System.out.println("Maze game started successfully.");
+        });
     }
 }

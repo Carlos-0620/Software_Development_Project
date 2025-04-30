@@ -13,6 +13,7 @@ public class Frame extends JFrame {
 
     public Frame(MazeGame game) {
         super("Maze Game");
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Make window fullscreen
 
         // Window configuration
         ImageIcon logo = new ImageIcon(getClass().getResource("/assets/logo.png"));
@@ -20,7 +21,7 @@ public class Frame extends JFrame {
         getContentPane().setBackground(new Color(64, 64, 64));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
-        setSize(1080, 720);
+        setSize(1080, 720); // Keep existing size
         setLocationRelativeTo(null);
 
         // Layout and panel setup
