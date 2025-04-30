@@ -40,7 +40,7 @@ public class Frame extends JFrame {
     }
 
     private void startGame() {
-        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input
+        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input.
         cardLayout.show(cardPanel, "Game");
     }
 
