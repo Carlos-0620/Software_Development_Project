@@ -3,9 +3,10 @@ package graphicalUserInterface;
 
 import game.MazeGame;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.swing.*;
 import maze.Maze;
 import sprites.Player;
@@ -17,21 +18,14 @@ public class MazePanel extends JPanel {
     private final Player player2;
     private final List<Sprite> spirits;
 
-    private int cellSize; // Dynamically calculated cell size
-    private final Image wallImage;
-    private final Image floorImage;
-    private final Image player1Image;
-    private final Image player2Image;
-    private final Image spiritImage;
-
-    private Runnable onGameEnd; // Callback for when the game ends
-    private boolean gameEnded = false;
+    private final int cellSize = 30;
+    private final Set<String> pressedKeys = new HashSet<>();
 
     public MazePanel(MazeGame game) {
         this.maze = game.getMaze();
         this.player1 = game.getPlayer1();
         this.player2 = game.getPlayer2();
-        this.spirits = game.getSprites();
+        this.spirits = game.getSprites(); // ✅ make sure this matches your MazeGame class
 
         // Load decorative images
         wallImage = new ImageIcon(getClass().getResource("/assets/maze_wall.jpg")).getImage();
@@ -43,8 +37,40 @@ public class MazePanel extends JPanel {
         setBackground(Color.BLACK);
         setFocusable(true);
 
-        // Add KeyListener for player movement
-        addKeyListener(new KeyAdapter() {
+        setupKeyBindings();
+        startGameLoop();
+
+        requestFocusInWindow();
+    }
+
+    private void setupKeyBindings() {
+        InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = getActionMap();
+
+        bindKey(im, am, "W", true);
+        bindKey(im, am, "W", false);
+        bindKey(im, am, "A", true);
+        bindKey(im, am, "A", false);
+        bindKey(im, am, "S", true);
+        bindKey(im, am, "S", false);
+        bindKey(im, am, "D", true);
+        bindKey(im, am, "D", false);
+
+        bindKey(im, am, "I", true);
+        bindKey(im, am, "I", false);
+        bindKey(im, am, "J", true);
+        bindKey(im, am, "J", false);
+        bindKey(im, am, "K", true);
+        bindKey(im, am, "K", false);
+        bindKey(im, am, "L", true);
+        bindKey(im, am, "L", false);
+    }
+
+    private void bindKey(InputMap im, ActionMap am, String key, boolean pressed) {
+        String actionKey = key + (pressed ? "_PRESSED" : "_RELEASED");
+        KeyStroke keyStroke = pressed ? KeyStroke.getKeyStroke(key) : KeyStroke.getKeyStroke("released " + key);
+        im.put(keyStroke, actionKey);
+        am.put(actionKey, new AbstractAction() {
             @Override
             public void keyPressed(KeyEvent e) {
                 handleKeyPress(e);
@@ -52,88 +78,63 @@ public class MazePanel extends JPanel {
         });
     }
 
-    public void setOnGameEnd(Runnable onGameEnd) {
-        this.onGameEnd = onGameEnd;
-    }
-
-    public void resetGame() {
-        gameEnded = false;
-        // Add any other reset logic needed
-        repaint();
-    }
-
-    private void handleKeyPress(KeyEvent e) {
-        System.out.println("MazePanel received key event: " + KeyEvent.getKeyText(e.getKeyCode()));
-
-        // If game has ended, ignore key presses
-        if (gameEnded) {
-            System.out.println("Game has ended - ignoring key press");
-            return;
-        }
-
-        int keyCode = e.getKeyCode();
-        boolean moved = false;
-
-        // Player 1 movement (WASD)
-        if (keyCode == KeyEvent.VK_W && maze.canMove(player1, "W")) {
-            System.out.println("Player 1 moving UP");
-            player1.move(-1, 0);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_S && maze.canMove(player1, "S")) {
-            player1.move(1, 0);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_A && maze.canMove(player1, "A")) {
-            player1.move(0, -1);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_D && maze.canMove(player1, "D")) {
-            player1.move(0, 1);
-            moved = true;
-        }
-
-        // Player 2 movement (Arrow keys)
-        if (keyCode == KeyEvent.VK_UP && maze.canMove(player2, "W")) {
-            player2.move(-1, 0);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_DOWN && maze.canMove(player2, "S")) {
-            player2.move(1, 0);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_LEFT && maze.canMove(player2, "A")) {
-            player2.move(0, -1);
-            moved = true;
-        }
-        if (keyCode == KeyEvent.VK_RIGHT && maze.canMove(player2, "D")) {
-            player2.move(0, 1);
-            moved = true;
-        }
-
-        // Only check win condition and repaint if a player moved
-        if (moved) {
-            System.out.println("Player 1 position: (" + player1.getRow() + "," + player1.getCol() + ")");
-            System.out.println("Player 2 position: (" + player2.getRow() + "," + player2.getCol() + ")");
-            System.out.println("Exit position: (" + (maze.getHeight() - 1) + "," + (maze.getWidth() - 1) + ")");
-
-            // Check for end of game
-            if (maze.isAtExit(player1)) {
-                System.out.println("Player 1 wins!");
-                gameEnded = true;
-                JOptionPane.showMessageDialog(this, "Player 1 wins!");
-                if (onGameEnd != null) {
-                    onGameEnd.run();
-                }
-            } else if (maze.isAtExit(player2)) {
-                System.out.println("Player 2 wins!");
-                gameEnded = true;
-                JOptionPane.showMessageDialog(this, "Player 2 wins!");
-                if (onGameEnd != null) {
-                    onGameEnd.run();
-                }
-            }
+    private void startGameLoop() {
+        Timer timer = new Timer(80, e -> {
+            updatePlayerMovement();
+            checkWinConditions();
             repaint();
+        });
+        timer.start();
+    }
+
+    private void startSpriteMovementLoop() {
+        Timer spriteTimer = new Timer(1000, e -> {
+            for (Sprite sprite : spirits) {
+                sprite.moveRandomly(maze);
+            }
+        });
+        spriteTimer.start();
+    }
+
+    private void updatePlayerMovement() {
+        if (pressedKeys.contains("W"))
+            tryMovePlayer(player1, "W");
+        if (pressedKeys.contains("A"))
+            tryMovePlayer(player1, "A");
+        if (pressedKeys.contains("S"))
+            tryMovePlayer(player1, "S");
+        if (pressedKeys.contains("D"))
+            tryMovePlayer(player1, "D");
+
+        if (pressedKeys.contains("I"))
+            tryMovePlayer(player2, "W");
+        if (pressedKeys.contains("J"))
+            tryMovePlayer(player2, "A");
+        if (pressedKeys.contains("K"))
+            tryMovePlayer(player2, "S");
+        if (pressedKeys.contains("L"))
+            tryMovePlayer(player2, "D");
+    }
+
+    private void tryMovePlayer(Player player, String direction) {
+        if (maze.canMove(player, direction)) {
+            switch (direction) {
+                case "W" -> player.move(-1, 0);
+                case "S" -> player.move(1, 0);
+                case "A" -> player.move(0, -1);
+                case "D" -> player.move(0, 1);
+            }
+        }
+    }
+
+    private void checkWinConditions() {
+        if (player1.getRow() == maze.getHeight() - 1 && player1.getCol() == maze.getWidth() - 1) {
+            JOptionPane.showMessageDialog(this, "🎉 Player 1 wins! 🎉");
+            System.exit(0);
+        }
+        if (player2.getRow() == 0 && player2.getCol() == 0) {
+            JOptionPane.showMessageDialog(this, "🎉 Player 2 wins! 🎉");
+            System.exit(0);
         }
     }
 
@@ -141,16 +142,6 @@ public class MazePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Calculate cell size to fill the entire panel
-        int panelWidth = getWidth();
-        int panelHeight = getHeight();
-        cellSize = Math.min(panelWidth / maze.getWidth(), panelHeight / maze.getHeight());
-
-        // Calculate offsets to center the maze if there's any remaining space
-        int xOffset = (panelWidth - (maze.getWidth() * cellSize)) / 2;
-        int yOffset = (panelHeight - (maze.getHeight() * cellSize)) / 2;
-
-        // Draw maze with larger cells
         for (int row = 0; row < maze.getHeight(); row++) {
             for (int col = 0; col < maze.getWidth(); col++) {
                 int x = xOffset + col * cellSize;
@@ -178,24 +169,13 @@ public class MazePanel extends JPanel {
             }
         }
 
-        // Draw players with proportional size
-        int spriteMargin = cellSize / 10;
-        g.drawImage(player1Image,
-                xOffset + player1.getCol() * cellSize + spriteMargin,
-                yOffset + player1.getRow() * cellSize + spriteMargin,
-                cellSize - (2 * spriteMargin),
-                cellSize - (2 * spriteMargin),
-                this);
+        g.setColor(Color.BLUE);
+        g.fillOval(player1.getCol() * cellSize + 5, player1.getRow() * cellSize + 5, cellSize - 10, cellSize - 10);
 
-        g.drawImage(player2Image,
-                xOffset + player2.getCol() * cellSize + spriteMargin,
-                yOffset + player2.getRow() * cellSize + spriteMargin,
-                cellSize - (2 * spriteMargin),
-                cellSize - (2 * spriteMargin),
-                this);
+        g.setColor(Color.RED);
+        g.fillOval(player2.getCol() * cellSize + 5, player2.getRow() * cellSize + 5, cellSize - 10, cellSize - 10);
 
-        // Draw spirits with proportional size
-        int spiritMargin = cellSize / 8;
+        g.setColor(Color.BLACK);
         for (Sprite spirit : spirits) {
             g.drawImage(spiritImage,
                     xOffset + spirit.getCol() * cellSize + spiritMargin,

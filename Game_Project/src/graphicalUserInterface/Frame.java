@@ -8,9 +8,9 @@ import javax.swing.*;
 public class Frame extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
-    private ReadyPanel readyPanel;
+    private final ReadyPanel readyPanel;
     private InstructionsPanel instructionsPanel;
-    private MazePanel mazePanel;
+    private final MazePanel mazePanel;
 
     public Frame(MazeGame game) {
         super("Maze Adventure");
@@ -35,7 +35,7 @@ public class Frame extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        // Ready Panel (Menu Panel)
+        // Ready Panel
         readyPanel = new ReadyPanel(() -> cardLayout.show(cardPanel, "Instructions"));
         cardPanel.add(readyPanel, "Ready");
 
@@ -52,21 +52,10 @@ public class Frame extends JFrame {
 
         // Show the ready panel initially
         cardLayout.show(cardPanel, "Ready");
+    }
 
-        // Add focus listener to debug focus changes
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-                .addPropertyChangeListener("focusOwner", evt -> {
-                    System.out.println("Focus changed to: " + evt.getNewValue());
-                });
-
-        // Add window listener to ensure focus
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowActivated(WindowEvent e) {
-                System.out.println("Window activated");
-                Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-                System.out.println("Current focus owner: " + focusOwner);
-            }
-        });
+    private void startGame() {
+        mazePanel.requestFocusInWindow(); // Ensure MazePanel grabs focus for key input
+        cardLayout.show(cardPanel, "Game");
     }
 }
