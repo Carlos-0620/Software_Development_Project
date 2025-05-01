@@ -1,7 +1,7 @@
 package graphicalUserInterface;
 
 import game.MazeGame;
-wwimport javax.swing.SwingUtilities;
+import javax.swing.SwingUtilities;
 
 public class MazeSwingMain {
     public static void main(String[] args) {
